@@ -252,9 +252,9 @@ class DocumentParser {
 					$alias = $this->virtualDir . '/' . $alias;
 				}
 				
-				if ($this->getDocumentListing($alias)!==false)
+				if ($this->getIdFromAlias($alias)!==false)
 				{
-					$this->documentIdentifier= $this->getDocumentListing($alias);
+					$this->documentIdentifier= $this->getIdFromAlias($alias);
 				}
 				else
 				{
@@ -263,7 +263,7 @@ class DocumentParser {
 			}
 			else
 			{
-				$this->documentIdentifier= $this->getDocumentListing($this->documentIdentifier);
+				$this->documentIdentifier= $this->getIdFromAlias($this->documentIdentifier);
 			}
 			$this->documentMethod= 'id';
 		}
@@ -277,7 +277,7 @@ class DocumentParser {
 				case $this->config['unauthorized_page']:
 					break;
 				default:
-					if($this->getDocumentListing($alias)===false) $this->sendErrorPage();
+					if($this->getIdFromAlias($alias)===false) $this->sendErrorPage();
 			}
 		}
 		
@@ -959,13 +959,13 @@ class DocumentParser {
 				$vdir = $this->virtualDir;
 				if (
 					(
-						($vdir != '' && !$this->getDocumentListing("{$vdir}/{$q}"))
+						($vdir != '' && !$this->getIdFromAlias("{$vdir}/{$q}"))
 						||
-						($vdir == '' && !$this->getDocumentListing($q))
+						($vdir == '' && !$this->getIdFromAlias($q))
 					)
 					&&
 					(
-						($vdir != '' && in_array($q, $this->getChildIds($this->getDocumentListing($vdir), 1)))
+						($vdir != '' && in_array($q, $this->getChildIds($this->getIdFromAlias($vdir), 1)))
 						||
 						($vdir == '' && in_array($q, $this->getChildIds(0, 1)))
 					))
@@ -1740,9 +1740,9 @@ class DocumentParser {
 			$identifier = $this->cleanDocumentIdentifier($identifier);
 			$method = $this->documentMethod;
 		}
-		if($method == 'alias' && $this->config['use_alias_path'] && $this->getDocumentListing($identifier)!==false)
+		if($method == 'alias' && $this->config['use_alias_path'] && $this->getIdFromAlias($identifier)!==false)
 		{
-			$identifier = $this->getDocumentListing($identifier);
+			$identifier = $this->getIdFromAlias($identifier);
 			$method = 'id';
 		}
 		// get document groups for current user
@@ -3807,6 +3807,12 @@ class DocumentParser {
 	
 	function getDocumentListing($str)
 	{
+		return $this->getIdFromAlias($str);
+	}
+	
+	function getIdFromAlias($str)
+	{
+		// todo alias_visible
 		$cacheKey = md5(__FUNCTION__ . $str);
 		$result = $this->getProcessCache($cacheKey);
 		if($result!==false) return $result;
@@ -3828,8 +3834,28 @@ class DocumentParser {
 				$rs  = $this->db->select('id', $tbl_site_content, "deleted=0 and parent='{$id}' and (alias='{$alias}' OR id='{$alias}')");
 				$row = $this->db->getRow($rs);
 				
-				if($row) $id = $row['id'];
-				else     $id = false;
+				if($row)
+				{
+					$id = $row['id'];
+				}
+				else
+				{
+					$rs  = $this->db->select('id', $tbl_site_content, "deleted=0 and parent='{$id}' and alias_visible='0'");
+					if($rs)
+					{
+						while($row = $this->db->getRow($rs))
+						{
+							$where = "deleted=0 and parent='{$row['id']}' and (alias='{$alias}' OR id='{$alias}')";
+							$rs  = $this->db->select('id', $tbl_site_content, $where);
+							if($rs)
+							{
+								$row = $this->db->getRow($rs);
+								$id = $row['id'];
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 		else

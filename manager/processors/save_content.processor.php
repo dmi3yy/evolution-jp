@@ -37,6 +37,7 @@ $menuindex       = !empty($_POST['menuindex']) ? $_POST['menuindex'] : 0;
 $searchable      = $_POST['searchable'];
 $cacheable       = $_POST['cacheable'];
 $syncsite        = $_POST['syncsite'];
+$aliasvisible    = $_POST['alias_visible'];
 $pub_date        = $_POST['pub_date'];
 $unpub_date      = $_POST['unpub_date'];
 $document_groups = (isset($_POST['chkalldocs']) && $_POST['chkalldocs'] == 'on') ? array() : $_POST['docgroups'];
@@ -218,7 +219,7 @@ switch ($actionToTake)
 		$createdon = time();
 		$editedby = $modx->getLoginUserID();
 		$editedon = time();
-		$field = compact(explode(',', 'alias,cacheable,content,contentType,content_dispo,createdby,createdon,description,donthit,editedby,editedon,hidemenu,introtext,isfolder,link_attributes,longtitle,menuindex,menutitle,pagetitle,parent,pub_date,published,publishedby,publishedon,richtext,searchable,template,type,unpub_date'));
+		$field = compact(explode(',', 'alias_visible,alias,cacheable,content,contentType,content_dispo,createdby,createdon,description,donthit,editedby,editedon,hidemenu,introtext,isfolder,link_attributes,longtitle,menuindex,menutitle,pagetitle,parent,pub_date,published,publishedby,publishedon,richtext,searchable,template,type,unpub_date'));
 		if(!empty($id)) $field['id'] = $id;
 		$newid = $modx->db->insert($field,$tbl_site_content);
 		if(!$newid)
@@ -447,6 +448,7 @@ switch ($actionToTake)
 
 		// update the document
 		$field = array();
+		$field['alias_visible']   = $aliasvisible;
 		$field['introtext']       = $introtext;
 		$field['content']         = $content;
 		$field['pagetitle']       = $pagetitle;
