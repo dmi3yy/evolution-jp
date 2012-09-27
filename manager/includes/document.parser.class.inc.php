@@ -3812,7 +3812,6 @@ class DocumentParser {
 	
 	function getIdFromAlias($str)
 	{
-		// todo alias_visible
 		$cacheKey = md5(__FUNCTION__ . $str);
 		$result = $this->getProcessCache($cacheKey);
 		if($result!==false) return $result;
