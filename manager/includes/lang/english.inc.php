@@ -1185,3 +1185,27 @@ $_lang["docid_incrmnt_method_message"] = 'Resource ID increment method';
 
 $_lang["base_url_title"] = 'Base URL';
 $_lang["base_url_message"] = 'Example: <b>[+MODX_BASE_URL+]</b><br />If it is made blank, it will process automatically.';
+$_lang["configcheck_del_actionphp"] = 'セキュリティ警告: action.phpが存在します';
+$_lang["configcheck_del_actionphp_msg"] = 'Captcha画像の表示に用いるaction.phpは1.0.6J-r4以降で不要になりました。セキュリティ上の問題があるため、削除するか、<a href="http://modx.jp/news/140.html" target="_blank">問題がFIXされたaction.php</a>を使用してください。';
+
+$_lang["a16_use_resources"] = 'このテンプレートを使用しているリソース';
+$_lang["a16_many_resources"] = 'リソース数が多いためここでは表示しません。';
+$_lang["a16_no_resource"] = 'このテンプレートを使用しているリソースはありません。';
+
+$_lang['a17_error_reporting_title'] = 'PHPエラーの検出レベル';
+$_lang['a17_error_reporting_msg'] = 'PHPエラーの検出レベルを設定します。';
+$_lang['a17_error_reporting_opt0'] = '全て無視する';
+$_lang['a17_error_reporting_opt1'] = '通知レベルの軽度の警告を無視する(<a href="https://www.google.com/search?hl=ja&q=E_DEPRECATED++E_STRICT" target="_blank">E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT</a>)';
+$_lang['a17_error_reporting_opt2'] = 'E_NOTICE 以外の全てのエラーを検出';
+$_lang['a17_error_reporting_opt99'] = '全て検出する';
+
+$_lang['enable_phx_message'] = '内蔵の簡易PHx機能を有効にします。プラグイン版PHxと比べると、if判定など複雑な処理はできません。';
+
+$_lang["role_site_schedule"] = '公開状態の一覧';
+
+$_lang["a95_convert_link"] = 'リンクタグ変換';
+$_lang["a95_convert_link_msg"] = 'サイト内リンクをリンクタグに変換します。';
+
+$_lang["a17_image_limit_width_title"] = '画像の横幅の最大値';
+$_lang["a17_image_limit_width_message"] = 'アップロードする画像の横幅を自動的に縮小します。空白にすると処理しません。';
+

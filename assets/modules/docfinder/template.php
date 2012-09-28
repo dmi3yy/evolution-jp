@@ -31,7 +31,7 @@
 		<title>Doc Finder 1.6</title>
 		
 		<!-- loading Manager Theme -->
-		<link rel="stylesheet" type="text/css" href="media/style<?php echo $theme; ?>/style.css" />
+		<link rel="stylesheet" type="text/css" href="media/style/RevoStyle/style.css" />
 		
 		<!-- loading Doc Finder CSS -->
 		<link rel="stylesheet" type="text/css" href="../assets/modules/docfinder/styles.css" />
@@ -64,7 +64,7 @@
 			<h1>Поиск по документам</h1>
 			<div id="actions">
 				<ul class="actionButtons">
-					<li id="Button1"><a href="#" onclick="document.location.href='index.php?a=106';"><img src="media/style/MODxCarbon/images/icons/stop.png" /> Закрыть поиск</a></li>
+					<li id="Button1"><a href="#" onclick="document.location.href='index.php?a=106';"><img src="media/style/RevoStyle/images/icons/stop.png" /> Закрыть поиск</a></li>
 				</ul>
 			</div>
 			
@@ -98,7 +98,7 @@
 						
 							<!-- help button search -->
 							<?php $helpText="Вы можете использовать выражения AND, OR и NOT в своем поиске. Также Вы может использовать регулярные выражения, если активируете их в Общих установках. Отметьте галочкой в Общих установках поиск - Где искать: ВСЕ - что бы вывести все возможные результаты поиска (например, если Вы ищете по дате)."; ?>
-							<img src="media/style<?php echo $theme; ?>/images/icons/b02_trans.gif" onmouseover="this.src='media/style<?php echo $theme; ?>/images/icons/b02.gif';" onmouseout="this.src='media/style<?php echo $theme; ?>/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
+							<img src="media/style/RevoStyle/images/icons/b02_trans.gif" onmouseover="this.src='media/style/RevoStyle/images/icons/b02.gif';" onmouseout="this.src='media/style/RevoStyle/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
 						
 							<!-- search history -->
 							<span id="search_history_box">
@@ -121,7 +121,7 @@
 
 							<!-- help button replace -->
 							<?php $helpText="Во всех документах, где найдена строка поиска она заменяется на строку замены. Внимание: Не работает в сочетании с логическими операторами и регулярными выражениями. ID документов исключен из замены."; ?>
-							<img src="media/style<?php echo $theme; ?>/images/icons/b02_trans.gif" onmouseover="this.src='media/style<?php echo $theme; ?>/images/icons/b02.gif';" onmouseout="this.src='media/style<?php echo $theme; ?>/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
+							<img src="media/style/RevoStyle/images/icons/b02_trans.gif" onmouseover="this.src='media/style/RevoStyle/images/icons/b02.gif';" onmouseout="this.src='media/style/RevoStyle/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
 							
 							<!-- replace history -->
 							<span id="replace_history_box">
@@ -162,7 +162,7 @@
 							
 							<!-- help sortable tables -->
 							<?php $helpText="Уберите галочку со Список можно сортировать, что улучшить совместимость с браузером IE."; ?>
-							<img src="media/style<?php echo $theme; ?>/images/icons/b02_trans.gif" onmouseover="this.src='media/style<?php echo $theme; ?>/images/icons/b02.gif';" onmouseout="this.src='media/style<?php echo $theme; ?>/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
+							<img src="media/style/RevoStyle/images/icons/b02_trans.gif" onmouseover="this.src='media/style/RevoStyle/images/icons/b02.gif';" onmouseout="this.src='media/style/RevoStyle/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
 						</p>
 						
 						<script type="text/javascript">
@@ -182,7 +182,7 @@
 
 							<!-- help button -->
 							<?php $helpText="Введите ID родительских документов. Вы можете ввести несколько ID, разделяя их запятой."; ?>
-							<img src="media/style<?php echo $theme; ?>/images/icons/b02_trans.gif" onmouseover="this.src='media/style<?php echo $theme; ?>/images/icons/b02.gif';" onmouseout="this.src='media/style<?php echo $theme; ?>/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
+							<img src="media/style/RevoStyle/images/icons/b02_trans.gif" onmouseover="this.src='media/style/RevoStyle/images/icons/b02.gif';" onmouseout="this.src='media/style/RevoStyle/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
 						</p>
 						
 						<!-- search in -->
@@ -234,26 +234,26 @@
 						<p class="date_range createdon">
 							<label for="createdon_start" class="text_label">Создано между:</label>
 							<input type="text" class="text" name="createdon_start" id="createdon_start" value="<?php echo $searchOptions['createdon_start']; ?>" />
-							<img src="media/style<?php echo $theme; ?>/images/icons/delete.gif" alt="Clear date" class="icon delete" onclick="$('createdon_start').value='';" />
+							<img src="media/style/RevoStyle/images/icons/delete.gif" alt="Clear date" class="icon delete" onclick="$('createdon_start').value='';" />
 							<input type="text" class="text" name="createdon_end" id="createdon_end" value="<?php echo $searchOptions['createdon_end']; ?>" />
-							<img src="media/style<?php echo $theme; ?>/images/icons/delete.gif" alt="Clear date" class="icon delete" onclick="$('createdon_end').value='';" />
+							<img src="media/style/RevoStyle/images/icons/delete.gif" alt="Clear date" class="icon delete" onclick="$('createdon_end').value='';" />
 							
 							<!-- help button replace -->
 							<?php $helpText="Установите диапазон дат создания документа, что бы отсеить не нужные результаты. Если установить только начальную дату создания, то будут искаться документы от этой даты - до сегодняшнего дня. Если указать только конечную дату создания, то будут искаться все документы созданные до этой даты включительно."; ?>
-							<img src="media/style<?php echo $theme; ?>/images/icons/b02_trans.gif" onmouseover="this.src='media/style<?php echo $theme; ?>/images/icons/b02.gif';" onmouseout="this.src='media/style<?php echo $theme; ?>/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
+							<img src="media/style/RevoStyle/images/icons/b02_trans.gif" onmouseover="this.src='media/style/RevoStyle/images/icons/b02.gif';" onmouseout="this.src='media/style/RevoStyle/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
 						</p>
 
 						<!-- date range edited on -->
 						<p class="date_range editedon">
 							<label for="editedon_start" class="text_label">Изменялось между:</label>
 							<input type="text" class="text" name="editedon_start" id="editedon_start" value="<?php echo $searchOptions['editedon_start']; ?>" />
-							<img src="media/style<?php echo $theme; ?>/images/icons/delete.gif" alt="Clear date" class="icon delete" onclick="$('editedon_start').value='';" />
+							<img src="media/style/RevoStyle/images/icons/delete.gif" alt="Clear date" class="icon delete" onclick="$('editedon_start').value='';" />
 							<input type="text" class="text" name="editedon_end" id="editedon_end" value="<?php echo $searchOptions['editedon_end']; ?>" />
-							<img src="media/style<?php echo $theme; ?>/images/icons/delete.gif" alt="Clear date" class="icon delete" onclick="$('editedon_end').value='';" />
+							<img src="media/style/RevoStyle/images/icons/delete.gif" alt="Clear date" class="icon delete" onclick="$('editedon_end').value='';" />
 							
 							<!-- help button replace -->
 							<?php $helpText="Установите диапазон дат последнего редактирования документа, что бы отсеить не нужные результаты. Если установить только начальную дату редактирования, то будут искаться документы от этой даты - до сегодняшнего дня. Если указать только конечную дату редактирования, то будут искаться все документы, которые последний раз редактировались до этой даты включительно."; ?>
-							<img src="media/style<?php echo $theme; ?>/images/icons/b02_trans.gif" onmouseover="this.src='media/style<?php echo $theme; ?>/images/icons/b02.gif';" onmouseout="this.src='media/style<?php echo $theme; ?>/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
+							<img src="media/style/RevoStyle/images/icons/b02_trans.gif" onmouseover="this.src='media/style/RevoStyle/images/icons/b02.gif';" onmouseout="this.src='media/style/RevoStyle/images/icons/b02_trans.gif';" alt="<?php echo $helpText; ?>" class="icon help" onclick="alert(this.alt);" />
 						</p>
 							
 						<script type="text/javascript">
@@ -270,7 +270,7 @@
 						<!-- search submit button-->
 						<li id="Button1">
 							<a href="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" id="submit_search">
-								Поиск <img src="media/style<?php echo $theme; ?>/images/icons/save.png" class="go" alt="Кликните или нажмите Enter, что бы начать поиск." />
+								Поиск <img src="media/style/RevoStyle/images/icons/save.png" class="go" alt="Кликните или нажмите Enter, что бы начать поиск." />
 								<input type="submit" value="Search" />
 							</a>
 						</li>
@@ -278,7 +278,7 @@
 						<!-- replace submit button-->
 						<li>
 							<a href="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" id="submit_replace">
-								Замена <img src="media/style<?php echo $theme; ?>/images/icons/save.png" class="replace" alt="Кликните или нажмите Enter, что бы начать поиск." />
+								Замена <img src="media/style/RevoStyle/images/icons/save.png" class="replace" alt="Кликните или нажмите Enter, что бы начать поиск." />
 							</a>
 						</li>
 					</ul>
@@ -309,7 +309,7 @@
 				<!-- AJAX load indicator -->
 				<div id="ajax_load_indicator">
 					<img src="../assets/modules/docfinder/images/ajax-loader.gif" width="220" height="19" alt="Ajax Loader" class="ajax_loader" />
-					<span>Поиск ...</span> <a href="#" id="cancel_search" title="Cancel search"><img src="media/style<?php echo $theme; ?>/images/icons/delete.gif" alt="Отмена поиска" /> Отменить поиск</a>				
+					<span>Поиск ...</span> <a href="#" id="cancel_search" title="Cancel search"><img src="media/style/RevoStyle/images/icons/delete.gif" alt="Отмена поиска" /> Отменить поиск</a>				
 				</div>
 				
 				<!-- AJAX results container -->
