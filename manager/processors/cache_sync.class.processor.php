@@ -9,7 +9,8 @@ class synccache {
 	var $parents = array();
 	var $target;
 	var $config = array();
-
+	var $aliasVisible = array();
+	
 	function synccache()
 	{
 		if(empty($this->target))      $this->target = 'pagecache,sitecache';
@@ -45,7 +46,7 @@ class synccache {
 		global $modx;
 		if(empty($this->aliases))
 		{
-			$fields = "id, IF(alias='', id, alias) AS alias, parent";
+			$fields = "id, IF(alias='', id, alias) AS alias, parent, alias_visible";
 			$tbl_site_content = $modx->getFullTableName('site_content');
 			$qh = $modx->db->select($fields,$tbl_site_content);
 			if ($qh && $modx->db->getRecordCount($qh) > 0)
@@ -54,6 +55,7 @@ class synccache {
 				{
 					$this->aliases[$row['id']] = $row['alias'];
 					$this->parents[$row['id']] = $row['parent'];
+					$this->aliasVisible[$row['id']] = $row['alias_visible'];
 				}
 			}
 		}
@@ -61,9 +63,12 @@ class synccache {
 		{
 			if($path !== '')
 			{
-				$path = $this->aliases[$id] . '/' . $path;
+				$path = $this->aliasVisible[$id] == 1 ? $this->aliases[$id] . '/' . $path : $path;
 			}
-			else $path = $this->aliases[$id];
+			else
+			{
+				$path = $this->aliasVisible[$id] == 1 ? $this->aliases[$id] : '';
+			}
 			
 			return $this->getParents($this->parents[$id], $path);
 		}
