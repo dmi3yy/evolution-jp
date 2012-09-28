@@ -1,7 +1,7 @@
 /**
  * mm_rules
  * 
- * ManagerManager用のカスタマイズルール(サンプル)
+ * ManagerManager - фаил настроек
  * 
  * @category	chunk
  * @version 	1.0.5r2
@@ -11,10 +11,13 @@
  * @internal    @installset base, sample
  */
 
-mm_widget_showimagetvs(); // Imageタイプのテンプレート変数の画像をプレビューします
+mm_widget_showimagetvs(); // Image
 if($modx->config['track_visitors']==='0') mm_hideFields('log');
 
 
+//mm_createTab('Для SEO', 'seo', '', '', '', '');
+//mm_moveFieldsToTab('titl,keyw,desc,seoOverride,noIndex', 'seo', '', '');
+mm_widget_tags('keyw',','); // Give blog tag editing capabilities to the 'documentTags (3)' TV
 
 /* ==========================================================
 http://modx.jp/docs/extras/plugins/mm.html
@@ -51,3 +54,16 @@ http://modx.jp/docs/extras/plugins/mm.html
 // mm_changeFieldHelp('introtext', 'A short summary of the story', '', $news_tpl);
 // mm_changeFieldHelp('parent', 'To move this story to a different folder: Click this icon to activate, then choose a new folder in the tree on the left.', '', $news_tpl);
 */
+
+//mm_createTab('Изображения', 'photos', '', '', '', '850');
+//mm_moveFieldsToTab('images,photos', 'photos', '', '');
+
+//mm_hideFields('longtitle,description,link_attributes,menutitle,content', '', '6,7');
+
+//mm_hideTemplates('0,5,8,9,11,12', '2,3');
+
+//mm_hideTabs('settings, access', '2');
+
+//mm_widget_evogallery(1, Галерея, '1,2,3', 3);   // подключаем галерею 
+//mm_galleryLink($fields, $roles, $templates, $moduleid);
+//mm_widget_evogallery($moduleid, $title, $roles, $templates);

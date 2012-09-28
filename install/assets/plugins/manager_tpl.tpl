@@ -1,8 +1,8 @@
 //<?php
 /**
- * 管理画面カスタマイズ
+ * manager_tpl
  *
- * ログイン画面・ダッシュボードのカスタマイズコード
+ * Кастомизация странички входа
  *
  * @category 	plugin
  * @version 	1.0.2
@@ -10,6 +10,7 @@
  * @internal	@events OnManagerLoginFormPrerender,OnManagerWelcomePrerender
  * @internal	@modx_category Manager and Admin
  * @internal    @installset base
+ * @internal    @disabled 1
  */
 
 /* 当プラグインの使い方
