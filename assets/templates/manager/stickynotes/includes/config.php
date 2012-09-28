@@ -21,7 +21,7 @@ $modx->db->query("
 		`finishedon` INT(12) NOT NULL,
 		`must_be_finishedon` INT(12) NOT NULL,
 		PRIMARY KEY  (`id`)
-	) TYPE=MyISAM;
+	);
 ");
 
 if(!function_exists('sticky_json')) {

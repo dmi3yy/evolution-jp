@@ -1,8 +1,7 @@
 <?php
 if(!defined('IN_MANAGER_MODE') || IN_MANAGER_MODE != 'true') exit();
-if (!isset($modx->config['mail_check_timeperiod']) || empty($modx->config['mail_check_timeperiod']))
-{
-	$modx->config['mail_check_timeperiod'] = 0;
+if (!array_key_exists('mail_check_timeperiod', $modx->config) || !is_numeric($modx->config['mail_check_timeperiod'])) {
+	$modx->config['mail_check_timeperiod'] = 5;
 }
 if ($manager_theme) $manager_theme .= '/';
 $mxla = $modx_lang_attribute ? $modx_lang_attribute : 'en';
@@ -13,7 +12,9 @@ $mxla = $modx_lang_attribute ? $modx_lang_attribute : 'en';
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $modx_manager_charset?>" />
 	<title>nav</title>
 	<link rel="stylesheet" type="text/css" href="media/style/<?php echo $manager_theme?>style.css" />
-	<script src="media/script/jquery/jquery.min.js" type="text/javascript"></script>
+	<script src="media/script/mootools/mootools.js" type="text/javascript"></script>
+	<script src="media/script/mootools/moodx.js" type="text/javascript"></script>
+    <script type="text/javascript" src="media/script/session.js"></script>
 	<script type="text/javascript">
 	// TREE FUNCTIONS - FRAME
 	// These functions affect the tree frame and any items that may be pointing to the tree.
@@ -23,59 +24,42 @@ $mxla = $modx_lang_attribute ? $modx_lang_attribute : 'en';
 
 	var workText;
 	var buildText;
-	var msgcheck = <?php echo $modx->hasPermission('messages') ? 1 : 0 ;?>;
-	
-	var $j = jQuery.noConflict();
-	
-	function keepMeAlive()
+
+	// Create the AJAX mail update object before requesting it
+	var updateMailerAjx = new Ajax('index.php',
 	{
-		var tok = document.getElementById('sessTokenInput').value;
-		var o = Math.random();
-		var url = 'includes/session_keepalive.php';
-		
-		$j.getJSON(url, {'tok':tok,'o':o},
-		function(resp)
-		{
-			if(resp.status != 'ok') window.location.href = 'index.php?a=8';
-	    });
-	}
-	window.setInterval('keepMeAlive()', 1000 * 60);
-	
+		method:'post',
+		postBody:'updateMsgCount=true',
+		onComplete:showResponse
+	});
 	function updateMail(now)
 	{
 		try
 		{
 		// if 'now' is set, runs immediate ajax request (avoids problem on initial loading where periodical waits for time period before making first request)
-			if (now && msgcheck!=0)
-			{
-				$j.ajax({type:'POST',url:'index.php',data:{'updateMsgCount':'true'},success:function(request){showResponse(request);}});
-			}
+			if (now)
+				updateMailerAjx.request();
 			return false;
 		} catch(oException) {
 			// Delay first run until we're ready...
-			if(msgcheck!=0) setTimeout('updateMail(true)',1000);
+			xx=updateMail.delay(1000,'',true);
 		}
 	};
 
 	function showResponse(request) {
 		var counts = request.split(',');
-		var elm = document.getElementById('msgCounter');
+		var elm = $('msgCounter');
 		if (elm) elm.innerHTML ='(' + counts[0] + ' / ' + counts[1] + ')';
-		var elm = document.getElementById('newMail');
+		var elm = $('newMail');
 		if (elm) elm.style.display = counts[0] >0 ? 'inline' :  'none';
 	}
 
-	$j(function(){
-		if(msgcheck!=0) updateMail(true); // First run update
-		var mailinterval = <?php echo $modx->config['mail_check_timeperiod'];?>;
-		if(mailinterval!='' && mailinterval!=0)
-		{
-			if(msgcheck!=0) setInterval('updateMail(true)',mailinterval * 1000);
-		}
-		
+	window.addEvent('load', function() {
+		updateMail(true); // First run update
+		updateMail.periodical(<?php echo $modx->config['mail_check_timeperiod'] * 1000 ?>, '', true); // Periodical Updater
 		if(top.__hideTree) {
 			// display toc icon
-			var elm = document.getElementById('tocText');
+			var elm = $('tocText');
 			if(elm) elm.innerHTML = "<a href='#' onclick='defaultTreeFrame();'><img src='<?php echo $_style['show_tree']?>' alt='<?php echo $_lang['show_tree']?>' width='16' height='16' /></a>";
 		}
 	});
@@ -84,7 +68,7 @@ $mxla = $modx_lang_attribute ? $modx_lang_attribute : 'en';
 		userDefinedFrameWidth = parent.document.getElementsByTagName("FRAMESET").item(1).cols;
 		currentFrameState = 'closed';
 		try {
-			var elm = document.getElementById('tocText');
+			var elm = $('tocText');
 			if(elm) elm.innerHTML = "<a href='#' onclick='defaultTreeFrame();'><img src='<?php echo $_style['show_tree']?>' alt='<?php echo $_lang['show_tree']?>' width='16' height='16' /></a>";
 			parent.document.getElementsByTagName("FRAMESET").item(1).cols = '<?php echo (!$modx_textdir ? '0,*' : '*,0')?>';
 			top.__hideTree = true;
@@ -97,7 +81,7 @@ $mxla = $modx_lang_attribute ? $modx_lang_attribute : 'en';
 		userDefinedFrameWidth = defaultFrameWidth;
 		currentFrameState = 'open';
 		try {
-			var elm = document.getElementById('tocText');
+			var elm = $('tocText');
 			if(elm) elm.innerHTML = "";
 			parent.document.getElementsByTagName("FRAMESET").item(1).cols = defaultFrameWidth;
 			top.__hideTree = false;
@@ -127,7 +111,7 @@ $mxla = $modx_lang_attribute ? $modx_lang_attribute : 'en';
 	// GENERAL FUNCTIONS - Refresh
 	// These functions are used for refreshing the tree or menu
 	function reloadtree() {
-		var elm = document.getElementById('buildText');
+		var elm = $('buildText');
 		if (elm) {
 			elm.innerHTML = "&nbsp;&nbsp;<img src='<?php echo $_style['icons_loading_doc_tree']?>' width='16' height='16' />&nbsp;<?php echo $_lang['loading_doc_tree']?>";
 			elm.style.display = 'block';
@@ -137,7 +121,7 @@ $mxla = $modx_lang_attribute ? $modx_lang_attribute : 'en';
 	}
 
 	function reloadmenu() {
-		var elm = document.getElementById('buildText');
+		var elm = $('buildText');
 		if (elm) {
 			elm.innerHTML = "&nbsp;&nbsp;<img src='<?php echo $_style['icons_working']?>' width='16' height='16' />&nbsp;<?php echo $_lang['loading_menu']?>";
 			elm.style.display = 'block';
@@ -164,13 +148,13 @@ $mxla = $modx_lang_attribute ? $modx_lang_attribute : 'en';
 	// GENERAL FUNCTIONS - Work
 	// These functions are used for showing the user the system is working
 	function work() {
-		var elm = document.getElementById('workText');
+		var elm = $('workText');
 		if (elm) elm.innerHTML = "&nbsp;<img src='<?php echo $_style['icons_working']?>' width='16' height='16' />&nbsp;<?php echo $_lang['working']?>";
 		else w=window.setTimeout('work()', 50);
 	}
 
 	function stopWork() {
-		var elm = document.getElementById('workText');
+		var elm = $('workText');
 		if (elm) elm.innerHTML = "";
 		else  ww=window.setTimeout('stopWork()', 50);
 	}
@@ -246,120 +230,162 @@ if($modx->hasPermission('help')) { ?>
 <?php
 // Concatenate menu items based on permissions
 
-// Site Menu
-$item['home']         = item($_lang['home'], 2);             // home
-$item['preview']      = item($_lang['preview'], '../', 1, 'target="_blank"'); // preview
-$item['refresh_site'] = item($_lang['refresh_site'], 26,$modx->hasPermission('empty_cache'));    // clear-cache
-$item['search']       = item($_lang['search'], 71);          // search
-$item['add_resource'] = item($_lang['add_resource'], 4,$modx->hasPermission('new_document')); // new-document
-$item['add_weblink']  = item($_lang['add_weblink'], 72,$modx->hasPermission('new_document')); // new-weblink
-
-// Resources Menu
-if($modx->hasPermission('new_template') || $modx->hasPermission('edit_template')
-|| $modx->hasPermission('new_snippet')  || $modx->hasPermission('edit_snippet')
-|| $modx->hasPermission('new_chunk')    || $modx->hasPermission('edit_chunk')
-|| $modx->hasPermission('new_plugin')   || $modx->hasPermission('edit_plugin'))
+function item($name, $href, $attrib='target="main"')
 {
-	$perm_element_management = 1;
+	global $modx;
+	
+	$tpl = '<li><a onclick="this.blur();" href="[+href+]" [+attrib+]>[+name+]</a></li>';
+	$ph = compact('href','name','attrib');
+	return $modx->parsePlaceholder($tpl, $ph);
 }
-else $perm_element_management = 0;
-$perm_manage_metatags = ($modx->hasPermission('manage_metatags') && $modx->config['show_meta'] == 1) ? 1 : 0;
+// Site Menu
+$sitemenu = array();
 
-$item['element_management'] = item($_lang['element_management'], 76,$perm_element_management);// Elements
-$item['manage_files']       = item($_lang['manage_files'], 31,$modx->hasPermission('file_manager'));// Manage-Files
-$item['manage_metatags']    = item($_lang['manage_metatags'], 81, $perm_manage_metatags); // Manage-Metatags
+$sitemenu[] = item($_lang['home'], 'index.php?a=2');             // home
+$sitemenu[] = item($_lang['preview'], '../', 'target="_blank"'); // preview
+if ($modx->hasPermission('empty_cache')) {
+	$sitemenu[] = item($_lang['refresh_site'], 'index.php?a=26');    // clear-cache
+}
+$sitemenu[] = item($_lang['search'], 'index.php?a=71');          // search
+if ($modx->hasPermission('new_document')) {
+	$sitemenu[] = item($_lang['add_resource'], 'index.php?a=4'); // new-document
+	$sitemenu[] = item($_lang['add_weblink'], 'index.php?a=72'); // new-weblink
+}
+
+// Elements Menu
+$resourcemenu = array();
+if($modx->hasPermission('new_template') || $modx->hasPermission('edit_template') || $modx->hasPermission('new_snippet') || $modx->hasPermission('edit_snippet') || $modx->hasPermission('new_chunk') || $modx->hasPermission('edit_chunk') || $modx->hasPermission('new_plugin') || $modx->hasPermission('edit_plugin')) {
+	// Elements
+	$resourcemenu[] = item($_lang['element_management'], 'index.php?a=76');
+}
+if($modx->hasPermission('file_manager')) {
+	// Manage-Files
+	$resourcemenu[] = item($_lang['manage_files'], 'index.php?a=31');
+}
+if($modx->hasPermission('manage_metatags') && $modx->config['show_meta'] == 1) {
+	// Manage-Metatags
+	$resourcemenu[] = item($_lang['manage_metatags'], 'index.php?a=81');
+}
 
 // Modules Menu Items
-$perm_module_management = ($modx->hasPermission('new_module') || $modx->hasPermission('edit_module')) ? 1 : 0;
-$item['modules']['module_management'] = item($_lang['module_management'], 106,$perm_module_management);// manage-modules
-if($modx->hasPermission('exec_module'))
-{
+$modulemenu = array();
+if($modx->hasPermission('new_module') || $modx->hasPermission('edit_module')) {
+	// manage-modules
+	$modulemenu[] = item($_lang['module_management'], 'index.php?a=106');
+}
+if($modx->hasPermission('exec_module')) {
 	// Each module
-	$tbl_site_modules       = $modx->getFullTableName('site_modules');
-	$tbl_site_module_access = $modx->getFullTableName('site_module_access');
-	$tbl_member_groups      = $modx->getFullTableName('member_groups');
-	$uid = $modx->getLoginUserID();
-	if ($_SESSION['mgrRole'] != 1)
-	{
+	if ($_SESSION['mgrRole'] != 1) {
 		// Display only those modules the user can execute
-		$field = 'sm.id, sm.name, mg.member';
-		$from = "{$tbl_site_modules}                 AS sm "
-		       ."LEFT JOIN {$tbl_site_module_access} AS sma ON sma.module = sm.id "
-		       ."LEFT JOIN {$tbl_member_groups}      AS mg  ON sma.usergroup = mg.user_group";
-		$where   = "(mg.member IS NULL OR mg.member='{$uid}') AND sm.disabled != 1";
-		$orderby = 'sm.editedon DESC';
-		$rs = $modx->db->select($field, $from, $where, $orderby);
-	}
-	else
-	{
+		$rs = $modx->db->query('SELECT DISTINCT sm.id, sm.name, mg.member
+				FROM '.$modx->getFullTableName('site_modules').' AS sm
+				LEFT JOIN '.$modx->getFullTableName('site_module_access').' AS sma ON sma.module = sm.id
+				LEFT JOIN '.$modx->getFullTableName('member_groups').' AS mg ON sma.usergroup = mg.user_group
+				WHERE (mg.member IS NULL OR mg.member = '.$modx->getLoginUserID().') AND sm.disabled != 1
+				ORDER BY sm.editedon DESC');
+	} else {
 		// Admins get the entire list
-		$rs = $modx->db->select('id,name', $tbl_site_modules, 'disabled != 1', 'editedon DESC');
+		$rs = $modx->db->select('id,name', $modx->getFullTableName('site_modules'), 'disabled != 1', 'editedon DESC');
 	}
-	
-	while ($content = $modx->db->getRow($rs))
-	{
-		$item['modules'][$content['name']] = item($content['name'], "index.php?a=112&amp;id={$content['id']}");
+	while ($content = $modx->db->getRow($rs)) {
+		$modulemenu[] = item($content['name'], "index.php?a=112&amp;id={$content['id']}");
 	}
-	if(0<count($item['modules'])) $modulemenu = join("\n", $item['modules']);
-	else                          $modulemenu = false;
 }
 
 // Security menu items (users)
-$perm_role_management = ($modx->hasPermission('new_role') || $modx->hasPermission('edit_role') || $modx->hasPermission('delete_role')) ? 1 : 0;
-$perm_mgruser = ($modx->hasPermission('access_permissions') && $modx->config['use_udperms'] == 1) ? 1 : 0;
-$perm_webuser = ($modx->hasPermission('web_access_permissions') && $modx->config['use_udperms'] == 1) ? 1 : 0;
-
-$item['user_management']     = item($_lang['user_management_title'], 75,$modx->hasPermission('edit_user'));// manager-users
-$item['web_user_management'] = item($_lang['web_user_management_title'], 99,$modx->hasPermission('edit_web_user'));// web-users
-$item['role_management']     = item($_lang['role_management_title'], 86, $perm_role_management);// roles
-$item['manager_permissions'] = item($_lang['manager_permissions'], 40,$perm_mgruser);// manager-perms
-$item['web_permissions']     = item($_lang['web_permissions'], 91,$perm_webuser);// web-user-perms
+$securitymenu = array();
+if($modx->hasPermission('edit_user')) {
+	// manager-users
+	$securitymenu[] = item($_lang['user_management_title'], 'index.php?a=75');
+}
+if($modx->hasPermission('edit_web_user')) {
+	// web-users
+	$securitymenu[] = item($_lang['web_user_management_title'], 'index.php?a=99');
+}
+if($modx->hasPermission('new_role') || $modx->hasPermission('edit_role') || $modx->hasPermission('delete_role')) {
+	// roles
+	$securitymenu[] = item($_lang['role_management_title'], 'index.php?a=86');
+}
+if($modx->hasPermission('access_permissions') && $modx->config['use_udperms'] == 1) {
+	// manager-perms
+	$securitymenu[] = item($_lang['manager_permissions'], 'index.php?a=40');
+}
+if($modx->hasPermission('web_access_permissions') && $modx->config['use_udperms'] == 1) {
+	// web-user-perms
+	$securitymenu[] = item($_lang['web_permissions'], 'index.php?a=91');
+}
 
 // Tools Menu
-$item['bk_manager']    = item($_lang['bk_manager'], 93,$modx->hasPermission('bk_manager'));// backup-mgr
-$item['remove_locks']  = item($_lang['remove_locks'], 'javascript:removeLocks();', $modx->hasPermission('remove_locks'),'');// unlock-pages
-$item['import_site']   = item($_lang['import_site'], 95,$modx->hasPermission('import_static'));// import-html
-$item['export_site']   = item($_lang['export_site'], 83,$modx->hasPermission('export_static'));// export-static-site
-$item['edit_settings'] = item($_lang['edit_settings'], 17,$modx->hasPermission('settings'));// configuration
+$toolsmenu = array();
+if($modx->hasPermission('bk_manager')) {
+	// backup-mgr
+	$toolsmenu[] = item($_lang['bk_manager'], 'index.php?a=93');
+}
+if($modx->hasPermission('remove_locks')) {
+	// unlock-pages
+	$toolsmenu[] = item($_lang['remove_locks'], 'javascript:removeLocks();', '');
+}
+if($modx->hasPermission('import_static')) {
+	// import-html
+	$toolsmenu[] = item($_lang['import_site'], 'index.php?a=95');
+}
+if($modx->hasPermission('export_static')) {
+	// export-static-site
+	$toolsmenu[] = item($_lang['export_site'], 'index.php?a=83');
+}
+if($modx->hasPermission('settings')) {
+	// configuration
+	$toolsmenu[] = item($_lang['edit_settings'], 'index.php?a=17');
+}
 
 // Reports Menu
-$item['site_schedule']   = item($_lang['site_schedule'], 70,$modx->hasPermission('view_schedule'));// site-sched
-$item['eventlog_viewer'] = item($_lang['eventlog_viewer'], 114,$modx->hasPermission('view_eventlog'));// eventlog
-$item['view_logging']    = item($_lang['view_logging'], 13,$modx->hasPermission('logs'));// manager-audit-trail
-$item['view_sysinfo']    = item($_lang['view_sysinfo'], 53);// system-info
+$reportsmenu = array();
+if($modx->hasPermission('view_schedule')) {
+// site-sched
+$reportsmenu[] = item($_lang['site_schedule'], 'index.php?a=70');
+}
 
-$sitemenu     = buildMenu('site',$item);
-$elementmenu  = buildMenu('element',$item);
-//$modulemenu   = buildMenu('module',$item);//$item['modules']
-$securitymenu = buildMenu('security',$item);
-$toolsmenu    = buildMenu('tools',$item);
-$reportsmenu  = buildMenu('reports',$item);
+if($modx->hasPermission('view_eventlog')) {
+	// eventlog
+	$reportsmenu[] = item($_lang['eventlog_viewer'], 'index.php?a=114');
+}
+if($modx->hasPermission('logs')) {
+	// manager-audit-trail
+	$reportsmenu[] = item($_lang['view_logging'], 'index.php?a=13');
+	// system-info
+	$reportsmenu[] = item($_lang['view_sysinfo'], 'index.php?a=53');
+}
 
 // Output Menus where there are items to show
 if (!empty($sitemenu)) {
-	echo '<li id="limenu1" class="active"><a href="#menu1" onclick="new NavToggle(this); return false;">'.$_lang['site'].'</a><ul class="subnav" id="menu1">'."\n".
-	     "{$sitemenu}\n</ul></li>\n";
-	     
+	echo "\t",'<li id="limenu3" class="active"><a href="#menu3" onclick="new NavToggle(this); return false;">',$_lang['site'],'</a><ul class="subnav" id="menu3">',"\n\t\t",
+	     implode("\n\t\t", $sitemenu),
+	     "\n\t</ul></li>\n";
 }
-if (!empty($elementmenu)) {
-	echo '<li id="limenu2"><a href="#menu2" onclick="new NavToggle(this); return false;">'.$_lang['elements'].'</a><ul class="subnav" id="menu2">'."\n".
-	     "{$elementmenu}\n</ul></li>\n";
+if (!empty($resourcemenu)) {
+	echo "\t",'<li id="limenu5"><a href="#menu5" onclick="new NavToggle(this); return false;">',$_lang['elements'],'</a><ul class="subnav" id="menu5">',"\n\t\t",
+	     implode("\n\t\t", $resourcemenu),
+	     "\n\t</ul></li>\n";
 }
 if (!empty($modulemenu)) {
-	echo '<li id="limenu3"><a href="#menu3" onclick="new NavToggle(this); return false;">'.$_lang['modules'].'</a><ul class="subnav" id="menu3">'."\n".
-	     "{$modulemenu}\n</ul></li>\n";
+	echo "\t",'<li id="limenu9"><a href="#menu9" onclick="new NavToggle(this); return false;">',$_lang['modules'],'</a><ul class="subnav" id="menu9">',"\n\t\t",
+	     implode("\n\t\t", $modulemenu),
+	     "\n\t</ul></li>\n";
 }
 if (!empty($securitymenu)) {
-	echo '<li id="limenu4"><a href="#menu4" onclick="new NavToggle(this); return false;">'.$_lang['users'].'</a><ul class="subnav" id="menu4">'."\n".
-	     "{$securitymenu}\n</ul></li>\n";
+	echo "\t",'<li id="limenu2"><a href="#menu2" onclick="new NavToggle(this); return false;">',$_lang['users'],'</a><ul class="subnav" id="menu2">',"\n\t\t",
+	     implode("\n\t\t", $securitymenu),
+	     "\n\t</ul></li>\n";
 }
 if (!empty($toolsmenu)) {
-	echo '<li id="limenu5"><a href="#menu5" onclick="new NavToggle(this); return false;">'.$_lang['tools'].'</a><ul class="subnav" id="menu5">'."\n".
-	     "{$toolsmenu}\n</ul></li>\n";
+	echo "\t",'<li id="limenu1-1"><a href="#menu1-1" onclick="new NavToggle(this); return false;">',$_lang['tools'],'</a><ul class="subnav" id="menu1-1">',"\n\t\t",
+	     implode("\n\t\t", $toolsmenu),
+	     "\n\t</ul></li>\n";
 }
 if (!empty($reportsmenu)) {
-	echo '<li id="limenu6"><a href="#menu6" onclick="new NavToggle(this); return false;">'.$_lang['reports'].'</a><ul class="subnav" id="menu6">'."\n".
-	     "{$reportsmenu}\n</ul></li>\n";
+	echo "\t",'<li id="limenu1-2"><a href="#menu1-2" onclick="new NavToggle(this); return false;">',$_lang['reports'],'</a><ul class="subnav" id="menu1-2">',"\n\t\t",
+	     implode("\n\t\t", $reportsmenu),
+	     "\n\t</ul></li>\n";
 }
 ?>
 	</ul>
@@ -370,44 +396,3 @@ if (!empty($reportsmenu)) {
 <div id="menuSplitter"></div>
 </body>
 </html>
-
-<?php
-function item($name, $href, $display=1, $attrib='target="main"')
-{
-	global $modx;
-	
-	if($display==0) return false;
-	
-	if(is_int($href)) $href = "index.php?a={$href}";
-	
-	$tpl = '<li><a onclick="this.blur();" href="[+href+]" [+attrib+]>[+name+]</a></li>';
-	$ph = compact('href','name','attrib');
-	return $modx->parsePlaceholder($tpl, $ph);
-}
-
-function buildMenu($target,$item)
-{
-	$menu['site']     = 'home,preview,refresh_site,search,add_resource,add_weblink';
-	$menu['element']  = 'element_management,manage_files,manage_metatags';
-	$menu['module']   = 'modules';
-	$menu['security'] = 'user_management,web_user_management,role_management,manager_permissions,web_permissions';
-	$menu['tools']    = 'bk_manager,remove_locks unlock-pages,import_site,export_site,edit_settings';
-	$menu['reports']  = 'site_schedule,eventlog_viewer,view_logging,view_sysinfo';
-	
-	if(empty($menu[$target])) return false;
-	
-	$a = explode(',',$menu[$target]);
-	foreach($a as $v)
-	{
-		$v = trim($v);
-		if(isset($item[$v])) $result[] = $item[$v];
-		elseif(isset($item['modules'][$v]))
-		{
-			$result[] = $item['modules'][$v];
-			unset($item['modules'][$v]);
-		}
-	}
-	
-	if(0<count($result)) return join("\n", $result);
-	else                 return false;
-}
