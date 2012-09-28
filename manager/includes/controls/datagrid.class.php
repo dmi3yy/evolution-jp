@@ -98,8 +98,8 @@ class DataGrid {
 			$color=$this->_colcolors[$c];
 			$type=$this->_coltypes[$c];
 			$nowrap=$this->_colwraps[$c];
-			$value = $row[($this->_isDataset && $fld) ? $fld:$c];
-			if($color && $Style) $colStyle = substr($colStyle,0,-1).";background-color:{$color};'";
+			$value = $row[($this->_isDataset && $fld ? $fld:$c)];
+			if($color && $Style) $colStyle = substr($colStyle,0,-1).";background-color:$color;'";
 			$value = $this->formatColumnValue($row,$value,$type,$align);
 			
 			if($align)  $align  = 'align="'   . $align  . '"';
@@ -207,15 +207,6 @@ class DataGrid {
 		$this->_total = 0;
 		
 		$this->_isDataset = is_resource($this->ds); // if not dataset then treat as array
-		if($this->_isDataset)
-		{
-			$tblc = mysql_num_fields($this->ds);
-			for($i=0;$i<$tblc;$i++)
-			{
-				$cinfo = mysql_fetch_field($this->ds,$i);
-				$this->_fieldnames[$i] = $cinfo->name;
-			}
-		}
 
 		if(!$cssStyle && !$cssClass) $cssStyle = '';
 		if(!$this->_itemStyle && !$this->_itemClass) $this->_itemStyle = "style='color:#333333;'";
@@ -296,7 +287,9 @@ class DataGrid {
 		
 		// build rows
 		$rowcount = $this->_isDataset ? $modx->db->getRecordCount($this->ds):count($this->ds);
-	
+		
+		$this->_fieldnames = explode($this->cdelim,$this->fields);
+		
 		if($rowcount==0) $tblRows.= "<tr><td ".$this->_itemStyle." ".$this->_itemClass." colspan='".$this->_colcount."'>".$this->noRecordMsg."</td></tr>\n";
 		else {
 			// render grid items

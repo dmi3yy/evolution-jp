@@ -115,21 +115,18 @@ if(!is_dir("{$base_path}assets/images"))
 			echo '</p>';
 			$errors += 1;
 		}
-		else
+		// File Browser directories writable?
+		echo "<p>".$_lang['checking_if_images_writable'];
+		if (!is_writable("{$base_path}content/images") || !is_writable("{$base_path}content/files") || !is_writable("{$base_path}content/flash") || !is_writable("{$base_path}content/media"))
 		{
-			// File Browser directories writable?
-			echo "<p>".$_lang['checking_if_images_writable'];
-			if (!is_writable("{$base_path}content/images") || !is_writable("{$base_path}content/files") || !is_writable("{$base_path}content/flash") || !is_writable("{$base_path}content/media"))
-			{
-			    echo echo_failed();
-			    $errors += 1;
-			}
-			else 
-			{
-			    echo echo_ok();
-			}
-			echo '</p>';
+		    echo echo_failed();
+		    $errors += 1;
 		}
+		else 
+		{
+		    echo echo_ok();
+		}
+		echo '</p>';
 	}
 }
 
@@ -401,7 +398,7 @@ function mkd($path)
 {
 	// if(ini_get('safe_mode') !=0) return;
 	
-	$rs = @mkdir($path, true);
+	$rs = @mkdir($path);
 	if($rs) $rs = @chmod($path, 0777);
 	return $rs;
 }

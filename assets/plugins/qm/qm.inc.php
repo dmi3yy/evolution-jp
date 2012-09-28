@@ -34,7 +34,8 @@ class Qm {
 		extract($params);
 		
 		// Get plugin parameters
-		$this->jqpath = 'manager/media/script/jquery/jquery.min.js';
+		$this->jqpath = 'assets/js/jquery.min.js';
+		$this->loadmanagerjq = $loadmanagerjq;
 		$this->loadfrontendjq = $loadfrontendjq;
 		$this->noconflictjq = $noconflictjq;
 		$this->loadtb = $loadtb;
@@ -517,29 +518,29 @@ EOT;
 					if ($this->noconflictjq == 'true')
 					{
 						$head .= '
-						var $j = jQuery.noConflict();
-						$j(function()
-						';
+var $j = jQuery.noConflict();
+$j(document).ready(function($)
+';
 						$jvar = 'j';
 					}
 					else
 					{
 						// jQuery in normal mode
-						$head .= '$(function()';
+						$head .= '$(document).ready(function($)';
 						$jvar = '';
 					}
 					$head .= '
 {
 $'.$jvar.'("a.colorbox").colorbox({width:"'.$this->tbwidth.'", height:"'.$this->tbheight.'", iframe:true, overlayClose:false, opacity:0.5, transition:"fade", speed:150});
 // Bindings
-$'.$jvar.'.bind("cbox_open", function()
+$'.$jvar.'(document).bind("cbox_open", function()
 {
 	$'.$jvar.'("body").css({"overflow":"hidden"});
 	$'.$jvar.'("html").css({"overflow":"hidden"});
 	$'.$jvar.'("#qmEditor").css({"display":"none"});
 });
 
-$'.$jvar.'.bind("cbox_closed", function()
+$'.$jvar.'(document).bind("cbox_closed", function()
 {
 	$'.$jvar.'("body").css({"overflow":"auto"});
 	$'.$jvar.'("html").css({"overflow":"auto"});
@@ -693,14 +694,9 @@ function getCookie(cookieName)
 					
 					// Manager control class
 					$mc = new Mcc();
-					$mc->noconflictjq = 'true';
-					
-					// Get jQuery conflict mode
-					if ($this->noconflictjq == 'true') $jq_mode = '$j';
-					else                               $jq_mode = '$';
 					
 					// Hide default manager action buttons
-					$mc->addLine($jq_mode . '("#actions").hide();');
+					$mc->addLine('$("#actions").hide();');
 					
 					// Get MODx theme
 					$qm_theme = $this->modx->config['manager_theme'];
@@ -708,15 +704,22 @@ function getCookie(cookieName)
 					// Get doc id
 					$doc_id = intval($_REQUEST['id']);
 					
+					// Get jQuery conflict mode
+					if ($this->noconflictjq == 'true') $jq_mode = '$j';
+					else                               $jq_mode = '$';
 					
 					// Add action buttons
 					$mc->addLine('var controls = "<div style=\"padding:4px 0;position:fixed;top:10px;right:-10px;z-index:1000\" id=\"qmcontrols\" class=\"actionButtons\"><ul><li><a href=\"#\" onclick=\"documentDirty=false;document.mutate.save.click();return false;\"><img src=\"media/style/'.$qm_theme.'/images/icons/save.png\" />'.$_lang['save'].'</a></li><li><a href=\"#\" onclick=\"documentDirty=false; parent.'.$jq_mode.'.fn.colorbox.close(); return false;\"><img src=\"media/style/'.$qm_theme.'/images/icons/stop.png\"/>'.$_lang['cancel'].'</a></li></ul></div>";');
 					
 					// Modify head
 					$mc->head = '<script type="text/javascript">document.body.style.display="none";</script>';
+					if ($this->loadmanagerjq == 'true')
+					{
+						$mc->head .= '<script src="'.$this->modx->config['site_url'].$this->jqpath.'" type="text/javascript"></script>';
+					}
 					
 					// Add control button
-					$mc->addLine($jq_mode . '("body").prepend(controls);');
+					$mc->addLine('$("body").prepend(controls);');
 					
 				// Hide fields to from front-end editors
 					if ($this->hidefields != '')
@@ -798,7 +801,7 @@ function getCookie(cookieName)
 			
 			// Check if current document is assigned to one or more doc groups
 			$result= $this->modx->db->select('id',$table,"document='{$docID}'");
-			$rowCount= $this->modx->db->getRecordCount($result);
+			$rowCount= $this->modx->recordCount($result);
 			
 			// If document is assigned to one or more doc groups, check access
 			if ($rowCount >= 1)
@@ -811,7 +814,7 @@ function getCookie(cookieName)
 					
 					// Check if user has access to current document
 					$result= $this->modx->db->select('id',$table,"document = {$docID} AND document_group IN ({$docGroup})");
-					$rowCount = $this->modx->db->getRecordCount($result);
+					$rowCount = $this->modx->recordCount($result);
 					
 					if ($rowCount >= 1) $access = TRUE;
 				}
@@ -897,7 +900,7 @@ function getCookie(cookieName)
 		if (!$access)
 		{
 			$result = $this->modx->db->select('id',$table,"tmplvarid = {$tvId}");
-			$rowCount = $this->modx->db->getRecordCount($result);
+			$rowCount = $this->modx->recordCount($result);
 			// TV is not in any document group
 			if ($rowCount == 0) { $access = TRUE; }
 		}
@@ -905,7 +908,7 @@ function getCookie(cookieName)
 		if (!$access && $this->docGroup != '')
 		{
 			$result = $this->modx->db->select('id',$table,"tmplvarid = {$tvId} AND documentgroup IN ({$this->docGroup})");
-			$rowCount = $this->modx->db->getRecordCount($result);
+			$rowCount = $this->modx->recordCount($result);
 			if ($rowCount >= 1) { $access = TRUE; }
 		}
 		return $access;
@@ -933,12 +936,12 @@ function getCookie(cookieName)
 	//_____________________________________________________
 	function checkLocked()
 	{
-		$tbl_active_users = $this->modx->getFullTableName('active_users');
+		$activeUsersTable = $this->modx->getFullTableName('active_users');
 		$pageId = $this->modx->documentIdentifier;
 		$locked = TRUE;
 		$userId = $_SESSION['mgrInternalKey'];
 		$where = "(`action` = 27) AND `internalKey` != '{$userId}' AND `id` = '{$pageId}'";
-		$result = $this->modx->db->select('internalKey',$tbl_active_users,$where);
+		$result = $this->modx->db->select('internalKey',$activeUsersTable,$where);
 		
 		if ($this->modx->db->getRecordCount($result) === 0)
 		{
@@ -952,7 +955,7 @@ function getCookie(cookieName)
 	//_____________________________________________________
 	function setLocked($locked)
 	{
-		$tbl_active_users = $this->modx->getFullTableName('active_users');
+		$activeUsersTable = $this->modx->getFullTableName('active_users');
 		$pageId = $this->modx->documentIdentifier;
 		$userId = $_SESSION['mgrInternalKey'];
 		
@@ -969,7 +972,7 @@ function getCookie(cookieName)
 			$fields['action'] = 2;
 		}
 		$where = "internalKey = '{$userId}'";
-		$result = $this->modx->db->update($fields, $tbl_active_users, $where);
+		$result = $this->modx->db->update($fields, $activeUsersTable, $where);
 	}
 	
 	// Save TV
@@ -1064,13 +1067,10 @@ function getCookie(cookieName)
 	
 	function get_img_prev_src()
 	{
-		if ($this->noconflictjq == 'true') $jq_mode = '$j';
-		else                               $jq_mode = '$';
-		
 		$src = <<< EOT
 <div id="qm-tv-image-preview"><img class="qm-tv-image-preview-drskip qm-tv-image-preview-skip" src="[+site_url+][tv_value+]" alt="" /></div>
 <script type="text/javascript" charset="UTF-8">
-{$jq_mode}(function()
+$(document).ready(function()
 {
 	var previewImage = "#tv[+tv_name+]";
 	var siteUrl = "[+site_url+]";
@@ -1079,18 +1079,18 @@ function getCookie(cookieName)
 	SetUrl = function(url, width, height, alt)
 	{	// Redefine it to also tell the preview to update
 		OriginalSetUrl(url, width, height, alt);
-		{$jq_mode}(previewImage).trigger("change");
+		$(previewImage).trigger("change");
 	}
-	{$jq_mode}(previewImage).change(function()
+	$(previewImage).change(function()
 	{
-		{$jq_mode}("#qm-tv-image-preview").empty();
-		if ({$jq_mode}(previewImage).val()!="" )
+		$("#qm-tv-image-preview").empty();
+		if ($(previewImage).val()!="" )
 		{
-			{$jq_mode}("#qm-tv-image-preview").append('<img class="qm-tv-image-preview-drskip qm-tv-image-preview-skip" src="' + siteUrl + {$jq_mode}(previewImage).val()  + '" alt="" />');
+			$("#qm-tv-image-preview").append('<img class="qm-tv-image-preview-drskip qm-tv-image-preview-skip" src="' + siteUrl + $(previewImage).val()  + '" alt="" />');
 		}
 		else
 		{
-			{$jq_mode}("#qm-tv-image-preview").append("");
+			$("#qm-tv-image-preview").append("");
 		}
 	});
 });

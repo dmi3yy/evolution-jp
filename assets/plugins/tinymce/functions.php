@@ -79,8 +79,7 @@ class TinyMCE
 		
 		if($modx->manager->action == 11 || $modx->manager->action == 12)
 		{
-			$selected = empty($params['theme']) ? '"selected"':'';
-			$theme_options .= '<option value="" ' . $selected . '>' . $_lang['mce_theme_global_settings'] . "</option>\n";
+			$theme_options .= '<option value="">' . $_lang['mce_theme_global_settings'] . "</option>\n";
 		}
 		$themes['simple']   = $_lang['mce_theme_simple'];
 		$themes['editor']   = $_lang['mce_theme_editor'];
@@ -155,6 +154,18 @@ class TinyMCE
 			$buttons1 = 'undo,redo,|,bold,strikethrough,|,justifyleft,justifycenter,justifyright,|,link,unlink,image,emotions,|,hr,|,help';
 			$buttons2 = '';
 		    break;
+		case 'editor':
+			$plugins  = 'visualblocks,autolink,inlinepopups,autosave,save,advlist,style,fullscreen,advimage,paste,advlink,media,contextmenu,table';
+			$buttons1 = 'undo,redo,|,bold,forecolor,backcolor,strikethrough,formatselect,fontsizeselect,pastetext,pasteword,code,|,fullscreen,help';
+			$buttons2 = 'image,media,link,unlink,anchor,|,justifyleft,justifycenter,justifyright,|,bullist,numlist,|,blockquote,outdent,indent,|,table,hr,|,visualblocks,styleprops,removeformat';
+			$buttons3 = '';
+			$buttons4 = '';
+			if(is_dir($params['mce_path'] . 'jscripts/tiny_mce/plugins/quickupload'))
+			{
+				$plugins = 'quickupload,'. $plugins;
+				$buttons2 = 'quickupload,'. $buttons2;
+			}
+		    break;
 		case 'creative':
 			$plugins = 'autolink,inlinepopups,autosave,advlist,layer,style,fullscreen,advimage,advhr,paste,advlink,media,contextmenu,table';
 			$buttons1 = 'undo,undo,redo,|,bold,forecolor,backcolor,strikethrough,formatselect,styleselect,fontsizeselect,code';
@@ -192,18 +203,7 @@ class TinyMCE
 			$buttons2 = $params['custom_buttons2'];
 			$buttons3 = $params['custom_buttons3'];
 			$buttons4 = $params['custom_buttons4'];
-			break;
-		default:
-			$plugins  = 'visualblocks,autolink,inlinepopups,autosave,save,advlist,style,fullscreen,advimage,paste,advlink,media,contextmenu,table';
-			$buttons1 = 'undo,redo,|,bold,forecolor,backcolor,strikethrough,formatselect,fontsizeselect,pastetext,pasteword,code,|,fullscreen,help';
-			$buttons2 = 'image,media,link,unlink,anchor,|,justifyleft,justifycenter,justifyright,|,bullist,numlist,|,blockquote,outdent,indent,|,table,hr,|,visualblocks,styleprops,removeformat';
-			$buttons3 = '';
-			$buttons4 = '';
-			if(is_dir($params['mce_path'] . 'jscripts/tiny_mce/plugins/quickupload'))
-			{
-				$plugins = 'quickupload,'. $plugins;
-				$buttons2 = 'quickupload,'. $buttons2;
-			}
+		    break;
 		}
 		
 		$str  = $this->build_mce_init($params,$plugins,$buttons1,$buttons2,$buttons3,$buttons4) . "\n";
@@ -221,7 +221,7 @@ class TinyMCE
 	{
 		global $modx;
 		
-		$ph['refresh_seed'] = filesize("{$this->mce_path}jscripts/tiny_mce/tiny_mce.js");
+		$ph['mce_version'] = $params['mce_version'];
 		$ph['mce_url'] = $params['mce_url'];
 		$ph['elmList'] = implode(",", $params['elements']);
 		$ph['width'] = (!empty($params['width'])) ? $params['width'] : '100%';
@@ -302,7 +302,7 @@ class TinyMCE
 		$ph['buttons3']                = $buttons3;
 		$ph['buttons4']                = $buttons4;
 		$ph['mce_formats']             = (empty($params['mce_formats'])) ? 'p,h1,h2,h3,h4,h5,h6,div,blockquote,code,pre,address' : $params['mce_formats'];
-		$ph['css_selectors']           = (empty($params['css_selectors'])) ? $modx->config['tinymce_css_selectors'] : $params['css_selectors'];
+		$ph['css_selectors']           = $params['css_selectors'];
 		$ph['disabledButtons']         = $params['disabledButtons'];
 		$ph['mce_resizing']            = $params['mce_resizing'];
 		$ph['date_format']             = $modx->toDateFormat(null, 'formatOnly');
@@ -312,18 +312,15 @@ class TinyMCE
 		$ph['terminate']               = (!empty($params['customparams'])) ? ',' : '';
 		$ph['customparams']            = rtrim($params['customparams'], ',');
 		$content_css[] = $params['mce_url'] . 'style/content.css';
-		if     (preg_match('@^/@', $params['editor_css_path']))
+		if     (preg_match('@^/@', $params['editor_css_path']) > 0)
 		{
 			$content_css[] = $params['editor_css_path'];
 		}
-		elseif (preg_match('@^http://@', $params['editor_css_path']))
+		elseif (preg_match('@^http://@', $params['editor_css_path']) > 0)
 		{
 			$content_css[] = $params['editor_css_path'];
 		}
-		elseif ($params['editor_css_path']!=='')
-		{
-			$content_css[] = MODX_SITE_URL . $params['editor_css_path'];
-		}
+		elseif ($params['editor_css_path']!=='') $content_css[] = MODX_BASE_URL . $params['editor_css_path'];
 			$ph['content_css']         = join(',', $content_css);
 		$ph['link_list']               = ($params['link_list']=='enabled') ? "'{$params['mce_url']}js/tinymce.linklist.php'" : 'false';
 	
