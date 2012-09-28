@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Title: JSON
  * Purpose:
@@ -56,14 +57,12 @@ $json_placeholders['json_op'] = (!empty($_REQUEST[$dittoID.'jsonp']) ? $_REQUEST
 $placeholders['*'] = "json_parameters";
 if(!function_exists("json_parameters")) { 
 	function json_parameters($placeholders) {
-		global $modx;
 		$jsonArr = array();
 		foreach ($placeholders as $name=>$value) {
-			$value = addslashes(htmlspecialchars($value,ENT_QUOTES, $modx->config['modx_charset']));
-			$jsonArr["json_{$name}"] = str_replace(array("\r\n","\n", "\r"), '\n', $value);
+			$jsonArr["json_".$name] = str_replace(array("\r\n","\r"), '\n', addslashes($value));
 		}
 		$placeholders = array_merge($jsonArr,$placeholders);
-		return $placeholders;
+		return $placeholders;	
 	}
 }
 // ---------------------------------------------------
@@ -90,7 +89,7 @@ $json_tpl = <<<TPL
 	 "guid":"[(site_url)][~[+id+]~]",
 	 "author":"[+json_author+]",
 	 "description":"[+json_description+]",
-	 "introtext":"[+json_introtext+]"
+	 "introtext":"[+json_introtext+]",
 	},
 
 TPL;
@@ -103,7 +102,7 @@ $json_tpl_last = <<<TPL
 	 "guid":"[(site_url)][~[+id+]~]",
 	 "author":"[+json_author+]",
 	 "description":"[+json_description+]",
-	 "introtext":"[+json_introtext+]"
+	 "introtext":"[+json_introtext+]",
 	}
 TPL;
 
@@ -119,11 +118,13 @@ TPL;
 
 $header = isset($header) ? $header : template::replace($json_placeholders,$json_header);
 
-$tpl = isset($tpl) ? $tpl : "@CODE:{$json_tpl}";
+$tpl = isset($tpl) ? $tpl : "@CODE:".$json_tpl;
 
-$tplLast = isset($tplLast) ? $tplLast : "@CODE:{$json_tpl_last}";
+$tplLast = isset($tplLast) ? $tplLast : "@CODE:".$json_tpl_last;
 
 $footer = isset($footer) ? $footer : $json_footer;
 
 // set emptytext
-$noResults = '      ';
+$noResults = "      ";
+
+?>

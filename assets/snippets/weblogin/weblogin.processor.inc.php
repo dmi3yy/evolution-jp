@@ -16,7 +16,7 @@ if ($isPWDActivate==1)
 	$pwdkey = $_REQUEST['wlk'];
 	
 	$rs  = $modx->db->select('*', $tbl_web_users, "id='{$uid}'");
-	$limit = $modx->db->getRecordCount($rs);
+	$limit = $modx->recordCount($rs);
 	if($limit==1)
 	{
 		$row = $modx->db->getRow($rs,'assoc');

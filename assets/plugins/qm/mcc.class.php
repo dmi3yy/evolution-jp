@@ -14,7 +14,6 @@ if(!class_exists('Mcc')) {
     var $tabs;
     var $sections;
     var $fields;
-    var $noconflictjq;
 
         //_______________________________________________________
         function Mcc() {
@@ -37,11 +36,6 @@ if(!class_exists('Mcc')) {
         
         //_______________________________________________________
         function addLine($line) {
-        	if($this->noconflictjq == 'true')
-        	{
-        		$line = str_replace('$(','$j(',$line);
-        	}
-        	
             $this->script.=$line."\n";
         }
         
@@ -49,12 +43,7 @@ if(!class_exists('Mcc')) {
         function Output() {
             $out = $this->head;
             $this->addLine('document.body.style.display="block";');
-        	if($this->noconflictjq == 'true')
-        	{
-        		$out.= '<script type="text/javascript">var $j = jQuery.noConflict(); $j(function(){'.$this->script.'});</script>';
-        	}
-        	else $out.= '<script type="text/javascript">$(function(){'.$this->script.'});</script>';
-            
+            $out.= '<script type="text/javascript">var $j = jQuery.noConflict(); $j(document).ready(function($){'.$this->script.'});</script>';
             return $out;
         }
         

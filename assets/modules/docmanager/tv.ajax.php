@@ -25,8 +25,6 @@ $from = "{$tbl_site_tmplvars} tv LEFT JOIN {$tbl_site_tmplvar_templates} ON tv.i
 $rs = $modx->db->select('*', $from, "{$tbl_site_tmplvar_templates}.templateid ='{$tplID}'");
 $total = $modx->db->getRecordCount($rs);
 
-header('Content-Type: text/html; charset='.$modx->config['modx_charset']);
-
 if ($total > 0)
 {
 	require("{$base_path}manager/includes/tmplvars.commands.inc.php");
@@ -277,25 +275,11 @@ function renderFormElement($field_type, $field_id, $default_text, $field_element
 } // end renderFormElement function
 
 function ParseIntputOptions($v) {
-	global $modx;
-	
 	$a = array();
 	if(is_array($v)) return $v;
 	else if(is_resource($v)) {
 		while ($cols = mysql_fetch_row($v)) $a[] = $cols;
 	}
-	else
-	{
-		$s = array('[[','[!','{{','[(','[~');
-		foreach($s as $_)
-		{
-			if(strpos($v,$_)!==false)
-			{
-				$v = $modx->parseDocumentSource($v);
-				break;
-			}
-		}
-		$a = explode('||', $v);
-	}
+	else $a = explode("||", $v);
 	return $a;
 }

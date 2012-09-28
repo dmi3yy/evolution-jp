@@ -5,11 +5,10 @@
 
 class SqlParser {
 	var $prefix, $mysqlErrors;
-	var $conn, $installFailed, $sitename, $adminname, $adminemail, $adminpass, $managerlanguage;
+	var $conn, $installFailed, $sitename, $adminname, $adminemail, $adminpass, $managerlanguage, $manager_theme;
 	var $mode;
 	var $dbVersion;
     var $connection_charset, $connection_collation, $autoTemplateLogic,$ignoreDuplicateErrors;
-    var $base_path;
 
 	function SqlParser() {
 		$this->prefix = 'modx_';
@@ -32,15 +31,15 @@ class SqlParser {
 			$this->dbVersion = (float) $ver; // Typecasting (float) instead of floatval() [PHP < 4.2]
 		}
 		
+		$filename = "sql/{$filename}";
 		// check to make sure file exists
-		$path = "{$this->base_path}install/sql/{$filename}";
-		if (!is_file($path)) {
-			$this->mysqlErrors[] = array("error" => "File '$path' not found");
+		if (!file_exists($filename)) {
+			$this->mysqlErrors[] = array("error" => "File '$filename' not found");
 			$this->installFailed = true ;
 			return false;
 		}
 
-		$idata = file_get_contents($path);
+		$idata = file_get_contents($filename);
 
 		$idata = str_replace("\r", '', $idata);
 
@@ -74,6 +73,7 @@ class SqlParser {
 		$ph['ADMINPASS']         = $this->adminpass;
 		$ph['MANAGERLANGUAGE']   = $this->managerlanguage;
 		$ph['AUTOTEMPLATELOGIC'] = $this->autoTemplateLogic;
+		$ph['MANAGER_THEME']     = $this->manager_theme;
 		$ph['DATE_NOW']          = time();
 		$idata = parse($idata,$ph,'{','}');
 		

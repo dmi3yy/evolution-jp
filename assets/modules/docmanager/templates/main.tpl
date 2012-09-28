@@ -4,34 +4,23 @@
         <title>[+lang.DM_module_title+]</title>
         <link rel="stylesheet" type="text/css" href="media/style[+theme+]/style.css" /> 
         <script type="text/javascript" src="media/script/tabpane.js"></script>
-        <script type="text/javascript" src="media/script/jquery/jquery.min.js"></script>
         <script type="text/javascript" src="media/script/mootools/mootools.js"></script>
         <script type="text/javascript" src="media/calendar/datepicker.js"></script>
         <script type="text/javascript" src="media/script/mootools/moodx.js"></script>
         <script type="text/javascript" src="../assets/modules/docmanager/js/docmanager.js"></script>
         <script type="text/javascript">
-	        var $j = jQuery.noConflict();
-	        $j(function(){
-	        	$j('table.grid td').css('cursor','pointer');
-				$j('table.grid td').click(function () {
-					var $c = $j(this).parent().children('td').children('input[type=radio]');
-					if($c.prop('checked')) $c.prop('checked', '');
-					else $c.prop('checked', 'checked');
-		    	});
-	        });
             function loadTemplateVars(tplId) {
-			    $j('#tvloading').css('display','block');
-			    $j.ajax(
-			    {
-			    	'type':'POST',
-			    	'url':'[+ajax.endpoint+]',
-			        'data': {'tplID':tplId},
-			        'success': function(r,s)
-			        {
-			        	document.getElementById('results').innerHTML = r;
-			            document.getElementById('tvloading').style.display = 'none';
+			    $('tvloading').style.display = 'block';
+			    new Ajax('[+ajax.endpoint+]', {
+			        update: 'results',
+			        method: 'post',
+			        postBody: 'theme=[+theme+]&tplID=' + tplId,
+			        evalScripts: true,
+			        onComplete: function(r) {
+			            $('tvloading').style.display = 'none';
 			        }
-			    });
+			    
+			    }).request();
 			}
 			
 		    function save() {
@@ -41,7 +30,7 @@
 		    function setMoveValue(pId, pName) {
 		      if (pId==0 || checkParentChildRelation(pId, pName)) {
 		        document.newdocumentparent.new_parent.value=pId;
-		        document.getElementById('parentName').innerHTML = "Parent: <strong>" + pId + "</strong> (" + pName + ")";
+		        $('parentName').innerHTML = "Parent: <strong>" + pId + "</strong> (" + pName + ")";
 		      }
 		    }
 
@@ -62,7 +51,7 @@
 			    return true;
 			}
 			
-			$j(function() {
+			window.addEvent('domready', function() {
 			    var dpOffset = [+datepicker.offset+];
 			    var dpformat = "[+datetime.format+]" + ' hh:mm:00';
 			    new DatePicker($('date_pubdate'), {'yearOffset' : dpOffset, 'format' : dpformat });
@@ -78,8 +67,7 @@
             <ul class="actionButtons">
                 <li id="Button1"><a href="#" onclick="document.location.href='index.php?a=2';"><img src="media/style[+theme+]/images/icons/stop.png" /> [+lang.DM_close+]</a></li>
             </ul>
-        </div>
-        <div class="section">
+        </div>        
 	    <div class="sectionHeader">[+lang.DM_action_title+]</div>
 	    <div class="sectionBody"> 
 	        <div class="tab-pane" id="docManagerPane"> 
@@ -117,7 +105,6 @@
 	           [+view.misc+]
 	           [+view.changeauthors+]
 	        </div>
-	    </div>
 	    </div>
 	</div>
 	[+view.documents+]

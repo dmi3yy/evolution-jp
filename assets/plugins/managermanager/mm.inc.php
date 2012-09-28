@@ -28,9 +28,29 @@ class MANAGERMANAGER
 		global $modx;
 		
 		extract($modx->event->params);
-		$mm_version = '0.3.12.1'; 
+		$mm_version = '0.3.12'; 
+		$js_default_url_local = $modx->config['site_url']. 'assets/js/jquery.min.js';
+		$js_default_url_remote = 'http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js';
 		
 		// Bring in some preferences which have been set on the configuration tab of the plugin, and normalise them
+		
+		// JS URL
+		switch ($which_jquery)
+		{
+			case 'local (assets/js)':
+				$js_url  = $js_default_url_local;
+				break;
+			case 'remote (google code)':
+				$js_url  = $js_default_url_remote;
+				break;
+			case 'manual url (specify below)':
+				$js_url  = $js_src_override;
+				break;
+		}
+		
+		// Should we remove deprecated Template variable types from the TV creation list?
+		$remove_deprecated_tv_types = ($remove_deprecated_tv_types_pref == 'yes') ? true : false;
+		
 		
 		// When loading widgets / functions, ignore folders / files beginning with these chars
 		$ignore_first_chars = array('.', '_', '!');
@@ -146,22 +166,11 @@ class MANAGERMANAGER
 				break;
 				
 				case 'custom_tv':
-					if(strpos($thisTv['elements'],'tvtype="text"')!==false)
-						$t = 'input';
-					elseif(strpos($thisTv['elements'],'tvtype="textarea"')!==false)
+					if(strpos($thisTv['elements'],'tvtype="textarea"')!==false)
 						$t = 'textarea';
 					elseif(strpos($thisTv['elements'],'tvtype="select"')!==false)
 						$t = 'select';
 					elseif(strpos($thisTv['elements'],'tvtype="checkbox"')!==false)
-					{
-						$t = 'input';
-						$fieldname_suffix = '[]';
-					}
-					elseif(strpos($thisTv['elements'],'<textarea')!==false)
-						$t = 'textarea';
-					elseif(strpos($thisTv['elements'],'<select')!==false)
-						$t = 'select';
-					elseif(strpos($thisTv['elements'],'"checkbox"')!==false)
 					{
 						$t = 'input';
 						$fieldname_suffix = '[]';
@@ -255,8 +264,10 @@ class MANAGERMANAGER
 				
 				// Load the jquery library
 				$output = '<!-- Begin ManagerManager output -->' . "\n";
+				$output .= includeJs($js_url, 'html');
 				
 				$output .= '<script type="text/javascript">' . "\n";
+				$output .= "var \$j = jQuery.noConflict(); \n"; //produces var  $j = jQuery.noConflict();
 		
 				$output .= "mm_lastTab = 'tabEvents'; \n";
 				$e->output($output);
@@ -282,6 +293,7 @@ class MANAGERMANAGER
 				case '300':
 				case '301':
 					$output  = '<!-- Begin ManagerManager output -->' . "\n";
+					$output .= includeJs($js_url, 'html');
 					$e->output($output);
 					break;
 				default: return;
@@ -292,11 +304,16 @@ class MANAGERMANAGER
 		case 'OnDocFormPrerender':
 			// Load the jquery library
 			echo '<!-- Begin ManagerManager output -->' . "\n";
+			$tbl_system_eventnames = $modx->getFullTableName('system_eventnames');
+			$rs = $modx->db->select('`name`',$tbl_system_eventnames,"`name`='OnManagerMainFrameHeaderHTMLBlock'");
+			if($modx->db->getRecordCount($rs)<1) echo includeJs($js_url, 'html');
 			
 			// Create a mask to cover the page while the fields are being rearranged
 			echo '
 				<div id="loadingmask">&nbsp;</div>
 				<script type="text/javascript">
+				var $j = jQuery.noConflict();
+		
 					$j("#loadingmask").css( {width: "100%", height: $j("body").height(), position: "absolute", zIndex: "1000", backgroundColor: "#ffffff"} );
 				</script>
 			';
@@ -316,18 +333,20 @@ class MANAGERMANAGER
 		<!-- You are logged into the following role: '. $mm_current_page['role'] .' -->
 				
 		<script type="text/javascript" charset="'.$modx->config['modx_charset'].'">
+		var $j = jQuery.noConflict();
+				
 		var mm_lastTab = "tabGeneral";
 		var mm_sync_field_count = 0;
 		var synch_field = new Array();
 		
-		$j(function()
-		{
+		$j(document).ready(function() {
 			
 			// Lets handle errors nicely...
-			try
-			{
+			try {
 			'
 					);
+			
+			
 			// Get the JS for the changes
 		  	
 			
@@ -336,20 +355,17 @@ class MANAGERMANAGER
 			
 			// See if there is any chunk output (e.g. it exists, and is not empty)
 			$chunk_output = $modx->getChunk($config_chunk);
-			if (!empty($chunk_output))
-			{
+			if (!empty($chunk_output)) {
 				$e->output("// Getting rules from chunk: $config_chunk \n\n");
 				eval($chunk_output); // If there is, run it.
-			}
-			else if (is_readable($config_file))
-			{	// If there's no chunk output, read in the file.
+			} else if (is_readable($config_file)) {	// If there's no chunk output, read in the file.
 				$e->output("// Getting rules from file: $config_file \n\n");
 				include($config_file);
-			}
-			else
-			{
+			} else {
 				$e->output("// No rules found \n\n");
 			}
+				
+			
 		    
 		    // Close it off
 		    $e->output( '
@@ -360,16 +376,14 @@ class MANAGERMANAGER
 				$j("div#tabGeneral table").attr("width", "100%");
 				
 				// if template variables containers are empty, remove their section
-				if ($j("div.tmplvars :input").length == 0)
-				{
+				if ($j("div.tmplvars :input").length == 0) {
 					$j("div.tmplvars").hide();	// Still contains an empty table and some dividers
 					$j("div.tmplvars").prev("div").hide();	// Still contains an empty table and some dividers
 					//$j("#sectionTVsHeader").hide();
 				}
 				
 				// If template category is empty, hide the optgroup
-				$j("#template optgroup").each( function()
-				{
+				$j("#template optgroup").each( function() {
 					var $this = $j(this),
 					visibleOptions = 0;
 					$this.find("option").each( function() {
@@ -378,15 +392,20 @@ class MANAGERMANAGER
 					if (visibleOptions == 0) $this.hide();
 				});
 				
-			}
-			catch (e)
-			{
+				// Re-initiate the tooltips, in order for them to pick up any new help text which has been added
+				// This bit is MooTools, matching code inserted further up the page
+				if( !window.ie6 ) {
+					$$(".tooltip").each(function(help_img) {
+						help_img.setProperty("title", help_img.getProperty("alt") );
+					});
+					new Tips($$(".tooltip"), {className:"custom"} );
+				}
+			
+			} catch (e) {
 				// If theres an error, fail nicely
 				alert("ManagerManager: An error has occurred: " + e.name + " - " + e.message);
 				
-			}
-			finally
-			{
+			} finally {
 				
 				// Whatever happens, hide the loading mask
 				$j("#loadingmask").hide();
@@ -396,6 +415,35 @@ class MANAGERMANAGER
 		<!-- ManagerManager Plugin :: End -->
 				');
 			break;
+		
+		
+		
+		
+		
+		case 'OnTVFormRender':
+		
+			if ($remove_deprecated_tv_types) {
+		
+				// Load the jquery library
+				echo '<!-- Begin ManagerManager output -->';
+			
+				// Create a mask to cover the page while the fields are being rearranged
+				echo '
+					<script type="text/javascript">
+					var $j = jQuery.noConflict();
+					$j("select[name=type] option").each( function() {
+														var $this = $j(this);
+														if( !($this.text().match("deprecated")==null )) {
+															$this.remove();
+														}
+																  });
+					</script>
+				';
+				echo '<!-- End ManagerManager output -->';
+			}
+		
+		break;
+		
 		
 		case 'OnBeforeDocFormSave':
 			global $template;

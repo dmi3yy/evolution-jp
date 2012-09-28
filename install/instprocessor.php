@@ -117,7 +117,7 @@ $sqlParser->managerlanguage = $managerlanguage;
 $sqlParser->autoTemplateLogic = $auto_template_logic;
 $sqlParser->manager_theme = $default_config['manager_theme'];
 $sqlParser->mode = ($installMode < 1) ? 'new' : 'upd';
-$sqlParser->base_path = $base_path;
+
 $sqlParser->ignoreDuplicateErrors = true;
 
 // install/update database
@@ -127,7 +127,7 @@ if ($moduleSQLBaseFile) {
 	// display database results
 	if ($sqlParser->installFailed == true) {
 		$errors += 1;
-		echo "<span class=\"notok\"><b>" . $_lang['database_alerts'] . "</b></span></p>";
+		echo "<span class=\"notok\"><b>" . $_lang['database_alerts'] . "</span></p>";
 		echo "<p>" . $_lang['setup_couldnt_install'] . "</p>";
 		echo "<p>" . $_lang['installation_error_occured'] . "<br /><br />";
 		for ($i = 0; $i < count($sqlParser->mysqlErrors); $i++) {
@@ -143,7 +143,7 @@ if ($moduleSQLBaseFile) {
 
 // write the config.inc.php file if new installation
 echo "<p>" . $_lang['writing_config_file'];
-$src = file_get_contents("{$base_path}install/tpl/config.inc.tpl");
+$src = file_get_contents('config.inc.tpl');
 $ph['database_type']               = 'mysql';
 $ph['database_server']             = $database_server;
 $ph['database_user']               = modx_escape($database_user);
@@ -153,6 +153,7 @@ $ph['database_connection_method']  = $database_connection_method;
 $ph['dbase']                       = $dbase;
 $ph['table_prefix']                = $table_prefix;
 $ph['lastInstallTime']             = time();
+$ph['site_sessionname']            = (!isset ($site_sessionname)) ? 'SN' . uniqid('') : $site_sessionname;
 $ph['https_port']                  = '443';
 
 $src = parse($src, $ph);
@@ -475,7 +476,9 @@ if (isset ($_POST['plugin']) || $installData)
 			$events = explode(",", $modulePlugin[4]);
 			$guid = modx_escape($modulePlugin[5]);
 			$category = modx_escape($modulePlugin[6]);
+			
 			$leg_names = '';
+			$disabled = modx_escape($modulePlugin[9]);
 			if(array_key_exists(7, $modulePlugin))
 			{
 				// parse comma-separated legacy names and prepare them for sql IN clause
@@ -539,7 +542,7 @@ if (isset ($_POST['plugin']) || $installData)
 				}
 				else
 				{
-					if(!@ mysql_query("INSERT INTO {$tbl_site_plugins} (name,description,plugincode,properties,moduleguid,category) VALUES('$name','$desc','$plugin','$properties','$guid',$category);"))
+					if(!@ mysql_query("INSERT INTO {$tbl_site_plugins} (name,description,plugincode,properties,moduleguid,category,disabled) VALUES('$name','$desc','$plugin','$properties','$guid',$category,$disabled);"))
 					{
 						echo "<p>" . mysql_error() . "</p>";
 						return;
@@ -629,7 +632,7 @@ if ($installData && $moduleSQLDataFile)
 	if ($sqlParser->installFailed == true)
 	{
 		$errors += 1;
-		echo "<span class=\"notok\"><b>" . $_lang['database_alerts'] . "</b></span></p>";
+		echo "<span class=\"notok\"><b>" . $_lang['database_alerts'] . "</span></p>";
 		echo "<p>" . $_lang['setup_couldnt_install'] . "</p>";
 		echo "<p>" . $_lang['installation_error_occured'] . "<br /><br />";
 		for ($i = 0; $i < count($sqlParser->mysqlErrors); $i++)
@@ -668,12 +671,7 @@ if (file_exists("{$base_path}assets/cache/installProc.inc.php"))
 	@chmod("{$base_path}assets/cache/installProc.inc.php", 0755);
 	unlink("{$base_path}assets/cache/installProc.inc.php");
 }
-if(is_writeable($base_path) && $installMode==0)
-{
-	copy("{$base_path}install/tpl/robots.tpl",    "{$base_path}sample.robots.txt");
-	if(!is_iis()) copy("{$base_path}install/tpl/htaccess.tpl",  "{$base_path}sample.htaccess");
-	else          copy("{$base_path}install/tpl/web.config.tpl","{$base_path}web.config");
-}
+
 // setup completed!
 echo "<p><b>" . $_lang['installation_successful'] . "</b></p>";
 echo "<p>" . $_lang['to_log_into_content_manager'] . "</p>";

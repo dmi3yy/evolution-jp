@@ -1,20 +1,48 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="Content-Type" content="text/html" />
-	<script type="text/javascript">
-		function getUrlParams() {
-			var params = {};
-			window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str,key,value) {
-				params[key.toLowerCase()] = value;
-			});
-			return params;
-		}
-		var params = getUrlParams();
-		window.location.href = "browse.php?opener=tinymce&type=" + params.type + "&langCode=ru&dir=" + params.type;
-	</script>
-</head>
+<?php
+$core_path = str_replace('\\','/',realpath('../../../../')) . '/manager/includes/';
+require_once("{$core_path}protect.inc.php");
+require_once("{$core_path}initialize.inc.php");
+require_once("{$core_path}config.inc.php");
+startCMSSession();
+if(!isset($_SESSION['mgrValidated']))
+{
+	die("<b>INCLUDE_ORDERING_ERROR</b><br /><br />Please use the MODX Content Manager instead of accessing this file directly.");
+}
 
-<body>
-</body>
-</html>
+$rb = new FBROWSER();
+$ph = array();
+$ph['seturl_js'] = $rb->seturl_js();
+$output = $rb->render_fbrowser($ph);
+echo $output;
+
+class FBROWSER
+{
+	function seturl_js()
+	{
+			$editor_path = htmlspecialchars($_GET['editorpath'], ENT_QUOTES);
+			switch($_GET['editor'])
+			{
+				case 'tinymce' :
+				case 'tinymce3':
+					$editor_path = rtrim($editor_path, '/') . '/';
+					$result = file_get_contents('seturl_js_tinymce.inc');
+					$result = str_replace('[+editor_path+]', $editor_path, $result);
+					break;
+				default:
+				$result = '<script src="seturl.js" type="text/javascript"></script>' . "\n";
+		}
+		return $result;
+	}
+	
+	function render_fbrowser($ph)
+	{
+		$browser_html = file_get_contents('browser.html.inc');
+		$browser_html2 = $browser_html;
+		foreach($ph as $name => $value)
+		{
+			$name = '[+' . $name . '+]';
+			$browser_html = str_replace($name, $value, $browser_html);
+		}
+		return $browser_html;
+	}
+}

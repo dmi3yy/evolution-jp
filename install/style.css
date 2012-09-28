@@ -401,6 +401,7 @@ p.labelHolder {
 
 #collationMask, #AUHMask {
 	background-color:#fff;
+	opacity:0;
 }
 
 tbody td {
