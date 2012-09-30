@@ -472,9 +472,9 @@ $body  = input_text('longtitle',to_safestr($content['longtitle']),'spellcheck="t
 $body .= tooltip($_lang['resource_long_title_help']);
 renderTr($_lang['long_title'],$body);
 
-$body  = input_text('description',to_safestr($content['description']),'spellcheck="true"');
+$body  = '<textarea name="description" class="inputBox" style="height:43px;" rows="2" cols="" onchange="documentDirty=true;">' . to_safestr($content['description']) . '</textarea>';
 $body .= tooltip($_lang['resource_description_help']);
-renderTr($_lang['resource_description'],$body);
+renderTr($_lang['resource_description'],$body,'vertical-align:top;');
 
 $body = '';
 if(isset($modx->config['suffix_mode']) && $modx->config['suffix_mode']==1)
@@ -498,10 +498,6 @@ else
 $body .= tooltip($_lang['resource_alias_help']);
 renderTr($_lang['resource_alias'],$body);
 
-$body  = input_text('link_attributes',to_safestr($content['link_attributes']));
-$body .= tooltip($_lang['link_attributes_help']);
-renderTr($_lang['link_attributes'],$body);
-
 if ($content['type'] == 'reference' || $_REQUEST['a'] == '72')
 { // Web Link specific
 ?>
@@ -518,16 +514,10 @@ if ($content['type'] == 'reference' || $_REQUEST['a'] == '72')
 			</tr>
 <?php
 }
+$body = '<textarea name="introtext" class="inputBox" style="height:60px;" rows="3" cols="" onchange="documentDirty=true;">' . to_safestr($content['introtext']) . '</textarea>';
+$body .= tooltip($_lang['resource_summary_help']);
+renderTr($_lang['resource_summary'],$body,'vertical-align:top;');
 ?>
-			<tr style="height: 24px;">
-				<td valign="top" width="100">
-					<span class="warning"><?php echo $_lang['resource_summary']?></span>
-				</td>
-                <td valign="top">
-                	<textarea name="introtext" class="inputBox" rows="3" cols="" onchange="documentDirty=true;"><?php echo to_safestr($content['introtext'])?></textarea>
-                	<?php echo tooltip($_lang['resource_summary_help']);?>
-				</td>
-			</tr>
 			<tr style="height: 24px;">
 				<td>
 					<span class="warning"><?php echo $_lang['page_data_template']?></span>
@@ -946,6 +936,11 @@ else
 <?php
 	}
 }//if mgrRole
+
+$body  = input_text('link_attributes',to_safestr($content['link_attributes']));
+$body .= tooltip($_lang['link_attributes_help']);
+renderTr($_lang['link_attributes'],$body);
+
 ?>
 
 			<tr style="height: 24px;">
@@ -1542,16 +1537,17 @@ EOT;
 	return $scr;
 }
 
-function renderTr($head, $body)
+function renderTr($head, $body,$rowstyle='')
 {
 	global $modx;
 	
 	$ph['head'] = $head;
 	$ph['body'] = $body;
+	$ph['rowstyle'] = $rowstyle;
 	
 	$tpl =<<< EOT
-	<tr style="height: 24px;">
-		<td width="100" align="left">
+	<tr style="height: 24px;[+rowstyle+]">
+		<td width="120" align="left">
 			<span class="warning">[+head+]</span>
 		</td>
 		<td>

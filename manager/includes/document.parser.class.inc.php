@@ -54,7 +54,8 @@ class DocumentParser {
     var $cacheRefreshTime;
     var $error_reporting;
     var $processCache;
-
+    var $http_status_code;
+    var $directParse;
 
     // constructor
 	function DocumentParser()
@@ -134,7 +135,7 @@ class DocumentParser {
 		}
 	}
 	
-	function executeParser()
+	function executeParser($id='')
 	{
 		ob_start();
 		//error_reporting(0);
@@ -147,6 +148,8 @@ class DocumentParser {
 			set_error_handler(array(& $this,'phpError'));
 		}
 		
+		$this->http_status_code = '200';
+		
 		if(!empty($_SERVER['QUERY_STRING']))
 		{
 			$qs = $_GET;
@@ -156,9 +159,19 @@ class DocumentParser {
 		}
 		
 		// get the settings
-		$this->db->connect();
-		$this->getSettings();
-		$this->initProcessCache();
+		if(!$this->db->conn)      $this->db->connect();
+		if(!isset($this->config)) $this->getSettings();
+		if(!$this->processCache)  $this->initProcessCache();
+		
+		if(!empty($id))
+		{
+			$_REQUEST['id'] = $id;
+			$_GET['id'] = $id;
+			$_SERVER['REQUEST_URI'] = $this->config['base_url'] . 'index.php?id=' . $id;
+			$this->directParse = 1;
+		}
+		else $this->directParse = 0;
+		
 		if(!isset($_REQUEST['id']))
 		{
 			$_REQUEST['q'] = substr($_SERVER['REQUEST_URI'],strlen($this->config['base_url']));
@@ -166,16 +179,19 @@ class DocumentParser {
 		}
 		if($_REQUEST['q']=='index.php') $_REQUEST['q'] = '';
 		
-		if(0 < count($_POST)) $this->config['cache_type'] = 0;
+		if(0 < count($_POST) && empty($id)) $this->config['cache_type'] = 0;
 		
-		$this->documentOutput = $this->get_static_pages();
-		if(!empty($this->documentOutput))
+		if(empty($id))
 		{
-			$this->documentOutput = $this->parseDocumentSource($this->documentOutput);
-			$this->invokeEvent('OnWebPagePrerender');
-			echo $this->documentOutput;
-			$this->invokeEvent('OnWebPageComplete');
-			exit;
+			$this->documentOutput = $this->get_static_pages();
+			if(!empty($this->documentOutput))
+			{
+				$this->documentOutput = $this->parseDocumentSource($this->documentOutput);
+				$this->invokeEvent('OnWebPagePrerender');
+				echo $this->documentOutput;
+				$this->invokeEvent('OnWebPageComplete');
+				exit;
+			}
 		}
 		
 		// IIS friendly url fix
@@ -252,9 +268,9 @@ class DocumentParser {
 					$alias = $this->virtualDir . '/' . $alias;
 				}
 				
-				if ($this->getDocumentListing($alias)!==false)
+				if ($this->getIdFromAlias($alias)!==false)
 				{
-					$this->documentIdentifier= $this->getDocumentListing($alias);
+					$this->documentIdentifier= $this->getIdFromAlias($alias);
 				}
 				else
 				{
@@ -263,7 +279,7 @@ class DocumentParser {
 			}
 			else
 			{
-				$this->documentIdentifier= $this->getDocumentListing($this->documentIdentifier);
+				$this->documentIdentifier= $this->getIdFromAlias($this->documentIdentifier);
 			}
 			$this->documentMethod= 'id';
 		}
@@ -277,7 +293,7 @@ class DocumentParser {
 				case $this->config['unauthorized_page']:
 					break;
 				default:
-					if($this->getDocumentListing($alias)===false) $this->sendErrorPage();
+					if($this->getIdFromAlias($alias)===false) $this->sendErrorPage();
 			}
 		}
 		
@@ -304,7 +320,7 @@ class DocumentParser {
 			// validation routines
 			if ($this->documentObject['deleted'] == 1)
 			{
-				$this->sendErrorPage();
+				if($this->http_status_code == '200') $this->sendErrorPage();
 			}
 			//  && !$this->checkPreview()
 			if ($this->documentObject['published'] == 0)
@@ -312,7 +328,7 @@ class DocumentParser {
 			// Can't view unpublished pages
 				if (!$this->hasPermission('view_unpublished'))
 				{
-					$this->sendErrorPage();
+					if($this->http_status_code == '200') $this->sendErrorPage();
 				}
 				else
 				{
@@ -325,7 +341,7 @@ class DocumentParser {
 					// Doesn't have access to this document
 					if (!$udperms->checkPermissions())
 					{
-						$this->sendErrorPage();
+						if($this->http_status_code == '200') $this->sendErrorPage();
 					}
 				}
 			}
@@ -371,10 +387,13 @@ class DocumentParser {
 			// Parse document source
 			$this->documentContent= $this->parseDocumentSource($this->documentContent);
 		}
-		register_shutdown_function(array (
-		& $this,
-		'postProcess'
-		)); // tell PHP to call postProcess when it shuts down
+		if($this->directParse==0)
+		{
+			register_shutdown_function(array (
+			& $this,
+			'postProcess'
+			)); // tell PHP to call postProcess when it shuts down
+		}
 		$result = $this->outputContent();
 		return $result;
 	}
@@ -539,6 +558,21 @@ class DocumentParser {
 					$filename = md5($_SERVER['REQUEST_URI']);
 					break;
 			}
+			
+			switch($this->http_status_code)
+			{
+				case '404':
+				case '403':
+					$filename = md5($this->makeUrl($docid));
+					break;
+			}
+			
+			if(mt_rand(0,99) < 5)
+			{
+				$file_count = count(glob($this->config['base_path'].'assets/cache/*.php'));
+				if(1000 < $file_count) $this->clearCache();
+			}
+			
 			$page_cache_path = "{$base_path}assets/cache/{$filename}.pageCache.php";
 			file_put_contents($page_cache_path, $cacheContent, LOCK_EX);
 		}
@@ -651,6 +685,7 @@ class DocumentParser {
 		if($this->config['error_page']) $dist = $this->config['error_page'];
 		else                            $dist = $this->config['site_start'];
 		
+		$this->http_status_code = '404';
 		$this->sendForward($dist, 'HTTP/1.0 404 Not Found');
 	}
 	
@@ -664,6 +699,7 @@ class DocumentParser {
 		elseif($this->config['error_page'])    $dist = $this->config['error_page'];
 		else                                   $dist = $this->config['site_start'];
 		
+		$this->http_status_code = '403';
 		$this->sendForward($dist , 'HTTP/1.1 403 Forbidden');
 	}
 
@@ -959,13 +995,13 @@ class DocumentParser {
 				$vdir = $this->virtualDir;
 				if (
 					(
-						($vdir != '' && !$this->getDocumentListing("{$vdir}/{$q}"))
+						($vdir != '' && !$this->getIdFromAlias("{$vdir}/{$q}"))
 						||
-						($vdir == '' && !$this->getDocumentListing($q))
+						($vdir == '' && !$this->getIdFromAlias($q))
 					)
 					&&
 					(
-						($vdir != '' && in_array($q, $this->getChildIds($this->getDocumentListing($vdir), 1)))
+						($vdir != '' && in_array($q, $this->getChildIds($this->getIdFromAlias($vdir), 1)))
 						||
 						($vdir == '' && in_array($q, $this->getChildIds(0, 1)))
 					))
@@ -1740,9 +1776,9 @@ class DocumentParser {
 			$identifier = $this->cleanDocumentIdentifier($identifier);
 			$method = $this->documentMethod;
 		}
-		if($method == 'alias' && $this->config['use_alias_path'] && $this->getDocumentListing($identifier)!==false)
+		if($method == 'alias' && $this->config['use_alias_path'] && $this->getIdFromAlias($identifier)!==false)
 		{
-			$identifier = $this->getDocumentListing($identifier);
+			$identifier = $this->getIdFromAlias($identifier);
 			$method = 'id';
 		}
 		// get document groups for current user
@@ -2238,19 +2274,34 @@ class DocumentParser {
 		return $resourceArray;
 	}
 	
-	function getDocuments($ids= array (), $published= 1, $deleted= 0, $fields= '*', $where= '', $sort= 'menuindex', $dir= 'ASC', $limit= '')
+	function getDocuments($ids= array(), $published= 1, $deleted= 0, $fields= '*', $where= '', $sort= 'menuindex', $dir= 'ASC', $limit= '')
 	{
-		if (count($ids) == 0)
+		if (count($ids) == 0 || empty($ids))
 		{
 			return false;
 		}
 		else
 		{
+			if(is_string($ids))
+			{
+				$ids = explode(',', $ids);
+				foreach($ids as $i=>$id)
+				{
+					$ids[$i] = trim($id);
+				}
+			}
+			
 			$tbl_site_content= $this->getFullTableName('site_content');
 			$tbl_document_groups= $this->getFullTableName('document_groups');
 			
 			// modify field names to use sc. table reference
-			$fields= 'sc.' . implode(',sc.', preg_replace("/^\s/i", '', explode(',', $fields)));
+			$fields = explode(',',$fields);
+			foreach($fields as $i=>$field)
+			{
+				$fields[$i] = 'sc.' . trim($field);
+			}
+			$fields = join(',',$fields);
+			
 			if($sort !== '')  $sort = 'sc.' . implode(',sc.', preg_replace("/^\s/i", '', explode(',', $sort)));
 			if ($where != '') $where= "AND {$where}";
 			// get document groups for current user
@@ -3807,7 +3858,12 @@ class DocumentParser {
 	
 	function getDocumentListing($str)
 	{
-		$cacheKey = md5(__FUNCTION__ . $str);
+		return $this->getIdFromAlias($str);
+	}
+	
+	function getIdFromAlias($alias)
+	{
+		$cacheKey = md5(__FUNCTION__ . $alias);
 		$result = $this->getProcessCache($cacheKey);
 		if($result!==false) return $result;
 		
@@ -3817,8 +3873,8 @@ class DocumentParser {
 		
 		if($this->config['use_alias_path']==1)
 		{
-			if(strpos($str,'/')!==false) $_a = explode('/', $str);
-			else                         $_a[] = $str;
+			if(strpos($alias,'/')!==false) $_a = explode('/', $alias);
+			else                         $_a[] = $alias;
 			$id= 0;
 			
 			foreach($_a as $alias)
