@@ -147,6 +147,8 @@ $_lang["configcheck_what"] = 'What does this mean?';
 $_lang["confirm_block"] = 'Are you sure you want to block this user?';
 $_lang["confirm_delete_eventlog"] = 'Are you sure you want to delete this event log?';
 $_lang["confirm_delete_file"] = 'Are you sure you want to delete the file?\n\nThis may stop your site from working properly! Only delete this file if you know for certain what you are doing will not break anything.';
+$_lang["confirm_delete_dir"] = 'Are you sure you want to delete the directory?';
+$_lang["confirm_delete_dir_recursive"] = 'Are you sure you want to delete the directory?\n\nAny children files will also be deleted.';
 $_lang["confirm_delete_htmlsnippet"] = 'Are you sure you want to delete this Chunk?';
 $_lang["confirm_delete_keywords"] = 'Are you sure you want to delete these keywords?';
 $_lang["confirm_delete_module"] = 'Are you sure you want to delete this Module?';
@@ -931,7 +933,6 @@ $_lang["template_tv_edit_title"] = 'Template Variable Sort Order';
 $_lang["template_tv_msg"] = 'The Template Variables assigned to this Template are listed below.';
 $_lang["thursday"] = 'Thursday';
 $_lang["tmplvar_access_msg"] = 'Select the Resource Groups that are allowed to modify the content or value of this Template Variable';
-$_lang["tmplvar_change_template_msg"] = 'Changing this Template will cause the page to reload the Template Variables, losing any unsaved changes.\n\n Are you sure you want to change this Template?';
 $_lang["tmplvar_inuse"] = 'The following Resource(s) are currently using this Template Variable. To continue with the delete operation click the Delete button otherwise click the Cancel button.';
 $_lang["tmplvar_tmpl_access"] = 'Template Access';
 $_lang["tmplvar_tmpl_access_msg"] = 'Select the Templates that are allowed to access/process this Template Variable';
@@ -1185,27 +1186,30 @@ $_lang["docid_incrmnt_method_message"] = 'Resource ID increment method';
 
 $_lang["base_url_title"] = 'Base URL';
 $_lang["base_url_message"] = 'Example: <b>[+MODX_BASE_URL+]</b><br />If it is made blank, it will process automatically.';
-$_lang["configcheck_del_actionphp"] = 'セキュリティ警告: action.phpが存在します';
-$_lang["configcheck_del_actionphp_msg"] = 'Captcha画像の表示に用いるaction.phpは1.0.6J-r4以降で不要になりました。セキュリティ上の問題があるため、削除するか、<a href="http://modx.jp/news/140.html" target="_blank">問題がFIXされたaction.php</a>を使用してください。';
 
-$_lang["a16_use_resources"] = 'このテンプレートを使用しているリソース';
-$_lang["a16_many_resources"] = 'リソース数が多いためここでは表示しません。';
-$_lang["a16_no_resource"] = 'このテンプレートを使用しているリソースはありません。';
+$_lang["configcheck_del_actionphp"] = 'Security alert: existing action.php. Shold be delete.';
+$_lang["configcheck_del_actionphp_msg"] = 'action.php used by captcha function what is unnecessary.';
 
-$_lang['a17_error_reporting_title'] = 'PHPエラーの検出レベル';
-$_lang['a17_error_reporting_msg'] = 'PHPエラーの検出レベルを設定します。';
-$_lang['a17_error_reporting_opt0'] = '全て無視する';
-$_lang['a17_error_reporting_opt1'] = '通知レベルの軽度の警告を無視する(<a href="https://www.google.com/search?hl=ja&q=E_DEPRECATED++E_STRICT" target="_blank">E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT</a>)';
-$_lang['a17_error_reporting_opt2'] = 'E_NOTICE 以外の全てのエラーを検出';
-$_lang['a17_error_reporting_opt99'] = '全て検出する';
+$_lang["a16_use_resources"] = 'The resources that uses this template';
+$_lang["a16_many_resources"] = 'Because there is much number of the resources, do not display it here.';
+$_lang["a16_no_resource"] = 'There is not the resources using this template.';
 
-$_lang['enable_phx_message'] = '内蔵の簡易PHx機能を有効にします。プラグイン版PHxと比べると、if判定など複雑な処理はできません。';
+$_lang['a17_error_reporting_title'] = 'Detection level of the PHP error';
+$_lang['a17_error_reporting_msg'] = 'Set the detection level of the PHP error.';
+$_lang['a17_error_reporting_opt0'] = 'Ignore all';
+$_lang['a17_error_reporting_opt1'] = 'Ignore the warning of a slight notice level(<a href="https://www.google.com/search?hl=ja&q=E_DEPRECATED++E_STRICT" target="_blank">E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT</a>)';
+$_lang['a17_error_reporting_opt2'] = 'Detect all errors except E_NOTICE';
+$_lang['a17_error_reporting_opt99'] = 'Detect all';
 
-$_lang["role_site_schedule"] = '公開状態の一覧';
+$_lang['enable_phx_message'] = 'Enable built-in simple PHx function. The complicated processing including the if judgment statement is not possible in comparison with PHx plugin.';
 
-$_lang["a95_convert_link"] = 'リンクタグ変換';
-$_lang["a95_convert_link_msg"] = 'サイト内リンクをリンクタグに変換します。';
+$_lang["role_site_schedule"] = 'The list which is in a published status';
 
-$_lang["a17_image_limit_width_title"] = '画像の横幅の最大値';
-$_lang["a17_image_limit_width_message"] = 'アップロードする画像の横幅を自動的に縮小します。空白にすると処理しません。';
+$_lang["a95_convert_link"] = 'Link tag conversion';
+$_lang["a95_convert_link_msg"] = 'Convert the link in the site into an link tag.';
 
+$_lang["a17_image_limit_width_title"] = 'The maximum of the width of the image(px)';
+$_lang["a17_image_limit_width_message"] = 'Reduce the width of the image to upload automatically. Do not handle it when make a blank.';
+
+$_lang["enable_bindings_title"]  = 'Enable @Bindings commands';
+$_lang['enable_bindings_message'] = 'Enable <a href="http://www.google.com/cse?cx=007286147079563201032%3Aigbcdgg0jyo&q=Bindings" target="_blank">@Bindings commands</a>. Describe any command in the entry field (template variable) on the contribution screen and carry out this function. When manage a site in plural members because the practice of the PHP sentence is possible, attention is necessary for the use of this function.';
