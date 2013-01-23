@@ -6,15 +6,8 @@
  * Author:         Russian MODX community, gabdullin, Jaroslav Sidorkin, Safronovich Victor, MARDEN
  * Date:           30 December 2010
  * Version:        2.0.5
- * MODX version:   Evolution 1.0.6
+ * MODX version:   Evolution 1.0.8
 */
-$modx_lang_attribute = 'ru'; // Manager HTML/XML Language Attribute see http://en.wikipedia.org/wiki/ISO_639-1
-$modx_manager_charset = 'UTF-8';
-setlocale (LC_ALL, 'ru_RU.UTF-8');
-
-
-$_lang["resource_opt_alvisibled"] = 'Участвует в URL'; 
-$_lang["resource_opt_alvisibled_help"] = 'Для участия данного документа в адресной строке поставьте галку, и наоборот - снимите, если псевдоним этого документа нужно убрать из URL.';
 
 $_lang["about_msg"] = 'MODX - это <a href="http://modxcms.com/what-is-modx.html" target="_blank">PHP Application Framework и Content Management System</a>, распространяемая по лицензии <a href="../assets/docs/license.txt">GNU GPL</a>.';
 $_lang["about_title"] = 'О MODX';
@@ -538,10 +531,6 @@ $_lang["module_resource_title"] = 'Зависимости модуля';
 $_lang["module_title"] = 'Создать / редактировать модуль';
 $_lang["module_viewdepend_msg"] = 'Здесь вы можете просмотреть, от каких элементов зависит этот модуль. Чтобы изменить зависимости, нажмите на \'Управление зависимостями\'.';
 $_lang["modules"] = 'Модули';
-$_lang["modx_news"] = 'Новости MODX';
-$_lang["modx_news_tab"] = 'Новости MODX';
-$_lang["modx_news_title"] = 'Новости MODX';
-$_lang["modx_security_notices"] = 'Уведомления безопасности MODX';
 $_lang["modx_version"] = 'Версия MODX';
 $_lang["monday"] = 'Понедельник';
 $_lang["move"] = 'Переместить';
@@ -703,7 +692,7 @@ $_lang["reset"] = 'Сброс';
 $_lang["reset_failedlogins"] = 'сброс';
 $_lang["resource"] = 'Ресурс';
 $_lang["resource_alias"] = 'Псевдоним';
-$_lang["resource_alias_help"] = "Здесь вы можете выбрать псевдоним для ресурса. Псевдоним позволяет обращаться к ресурсу по адресу: http://example.com/псевдоним. Внимание: функция будет работать только при включенных 'дружественных URL'."; 
+$_lang["resource_alias_help"] = "Здесь вы можете выбрать псевдоним для ресурса. Псевдоним позволяет обращаться к ресурсу по адресу: http://example.com/псевдоним. Внимание: функция будет работать только при включенных 'дружественных URL'.";
 $_lang["resource_content"] = 'Содержимое ресурса';
 $_lang["resource_description"] = 'Описание';
 $_lang["resource_description_help"] = 'Здесь вы можете ввести описание ресурса.';
@@ -827,12 +816,6 @@ $_lang["role_view_logs"] = 'Просмотр системного протоко
 $_lang["role_view_unpublished"] = 'Просмотр неопубликованных ресурсов';
 $_lang["role_web_access_persmissions"] = 'Права веб-доступа';
 $_lang["role_web_user_management"] = 'Управление веб-пользователями';
-$_lang["rss_url_news_default"] = 'http://feeds.feedburner.com/modx-announce';
-$_lang["rss_url_news_message"] = 'Введите адрес (URL) RSS-ленты новостей MODX.';
-$_lang["rss_url_news_title"] = 'Лента RSS новостей';
-$_lang["rss_url_security_default"] = 'http://feeds.feedburner.com/modxsecurity';
-$_lang["rss_url_security_message"] = 'Введите адрес (URL) RSS-ленты безопасности MODX.';
-$_lang["rss_url_security_title"] = 'Лента RSS безопасности';
 $_lang["run_module"] = 'Запуск модуля';
 $_lang["saturday"] = 'Суббота';
 $_lang["save"] = 'Сохранить';
@@ -840,6 +823,7 @@ $_lang["save_all_changes"] = 'Сохранить изменения';
 $_lang["save_tag"] = 'Сохранить тег';
 $_lang["saving"] = 'Сохранение ресурса, подождите пожалуйста...';
 $_lang["search"] = 'Поиск';
+$_lang["search_resource"] = 'Search';
 $_lang["search_criteria"] = 'Критерий поиска';
 $_lang["search_criteria_content"] = 'Искать в содержимом';
 $_lang["search_criteria_content_msg"] = 'Найти все ресурсы, содержащие введенный текст в своем теле.';
@@ -858,8 +842,6 @@ $_lang["search_results_returned_msg"] = 'По вашему запросу най
 $_lang["search_results_returned_title"] = 'Заголовок';
 $_lang["search_view_docdata"] = 'Просмотреть';
 $_lang["security"] = 'Менеджеры';
-$_lang["security_notices_tab"] = 'Уведомления безопасности';
-$_lang["security_notices_title"] = 'Уведомления безопасности';
 $_lang["select_date"] = 'Выбрать дату';
 $_lang["send"] = 'Отправить';
 $_lang["server_protocol_http"] = 'http';
@@ -957,6 +939,7 @@ $_lang["tmplvar_tmpl_access"] = 'Доступ шаблонов';
 $_lang["tmplvar_tmpl_access_msg"] = 'Укажите шаблоны, которые могут использовать этот Параметр (TV)';
 $_lang["tmplvars"] = 'Параметры (TV)';
 $_lang["tmplvars_binding_msg"] = 'Это поле поддерживает привязку данных с использованием @-команд';
+$_lang["tmplvars_input_option_msg"] = 'Ex) OptionA||OptionB or OptionA==ValA||OptionB==ValB usable @ commands.';
 $_lang["tmplvars_caption"] = 'Заголовок';
 $_lang["tmplvars_default"] = 'Значение по умолчанию';
 $_lang["tmplvars_description"] = 'Описание';
@@ -1091,6 +1074,7 @@ $_lang["yourinfo_role"] = 'Ваша роль:';
 $_lang["yourinfo_title"] = 'Информация о вас';
 $_lang["yourinfo_total_logins"] = 'Всего авторизаций:';
 $_lang["yourinfo_username"] = 'Вы авторизованы как:';
+
 // modx_ja
 $_lang["day_names"] = 'Вс,Пн,Вт,Ср,Чт,Пт,Сб';
 $_lang["month_names"] = 'Янв,Фев,Мар,Апр,Мая,Июн,Июл,Авг,Сен,Окт,Ноя,Дек';
@@ -1203,31 +1187,77 @@ $_lang["docid_incrmnt_method_2"] = 'MAX value';
 $_lang["docid_incrmnt_method_message"] = 'Resource ID increment method';
 
 $_lang["base_url_title"] = 'Base URL';
-$_lang["base_url_message"] = 'Example: <b>[+MODX_BASE_URL+]</b><br />If it is made blank, it will process automatically.';
+$_lang["base_url_message"] = 'Например: <b>[+MODX_BASE_URL+]</b><br />Если оставить пустым, заполнится автоматически.';
 
 $_lang["configcheck_del_actionphp"] = 'Security alert: existing action.php. Shold be delete.';
 $_lang["configcheck_del_actionphp_msg"] = 'action.php used by captcha function what is unnecessary.';
 
-$_lang["a16_use_resources"] = 'The resources that uses this template';
-$_lang["a16_many_resources"] = 'Because there is much number of the resources, do not display it here.';
-$_lang["a16_no_resource"] = 'There is not the resources using this template.';
+$_lang["a16_use_resources"] = 'Ресурсы использующие этот шаблон';
+$_lang["a16_many_resources"] = 'Не показывают из-за большого количества ресурсов здесь.';
+$_lang["a16_no_resource"] = 'Нет никаких ресурсов, использующих этот шаблон.';
 
-$_lang['a17_error_reporting_title'] = 'Detection level of the PHP error';
-$_lang['a17_error_reporting_msg'] = 'Set the detection level of the PHP error.';
-$_lang['a17_error_reporting_opt0'] = 'Ignore all';
-$_lang['a17_error_reporting_opt1'] = 'Ignore the warning of a slight notice level(<a href="https://www.google.com/search?hl=ja&q=E_DEPRECATED++E_STRICT" target="_blank">E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT</a>)';
-$_lang['a17_error_reporting_opt2'] = 'Detect all errors except E_NOTICE';
-$_lang['a17_error_reporting_opt99'] = 'Detect all';
+$_lang['a17_error_reporting_title'] = 'Уровень отображения ошибок PHP';
+$_lang['a17_error_reporting_msg'] = 'Установите уровень отображения ошибок PHP.';
+$_lang['a17_error_reporting_opt0'] = 'Игнорировать все';
+$_lang['a17_error_reporting_opt1'] = 'Игнорировать Warning и Notice (<a href="https://www.google.com/search?hl=ja&q=E_DEPRECATED++E_STRICT" target="_blank">E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT</a>)';
+$_lang['a17_error_reporting_opt2'] = 'Отобраать все ошибки, за исключением E_NOTICE';
+$_lang['a17_error_reporting_opt99'] = 'Отображать все';
 
-$_lang['enable_phx_message'] = 'Enable built-in simple PHx function. The complicated processing including the if judgment statement is not possible in comparison with PHx plugin.';
+$_lang['enable_phx_message'] = 'Использовать встроенный PHX, работают только модификаторы.';
 
 $_lang["role_site_schedule"] = 'The list which is in a published status';
 
 $_lang["a95_convert_link"] = 'Link tag conversion';
 $_lang["a95_convert_link_msg"] = 'Convert the link in the site into an link tag.';
 
-$_lang["a17_image_limit_width_title"] = 'The maximum of the width of the image(px)';
-$_lang["a17_image_limit_width_message"] = 'Reduce the width of the image to upload automatically. Do not handle it when make a blank.';
+$_lang["a17_image_limit_width_title"] = 'Максимальная ширина загружаемых картинок';
+$_lang["a17_image_limit_width_message"] = 'Автоматически уменьшает ширину загруженных изображений. Если оставить пустым, то без ограничения.';
 
 $_lang["enable_bindings_title"]  = 'Enable @Bindings commands';
 $_lang['enable_bindings_message'] = 'Enable <a href="http://www.google.com/cse?cx=007286147079563201032%3Aigbcdgg0jyo&q=Bindings" target="_blank">@Bindings commands</a>. Describe any command in the entry field (template variable) on the contribution screen and carry out this function. When manage a site in plural members because the practice of the PHP sentence is possible, attention is necessary for the use of this function.';
+
+$_lang["a83_mode_title"] = 'Generate mode';
+$_lang["a83_mode_direct"] = 'Direct parse';
+$_lang["a83_mode_crawl"] = 'Crawl (legacy mode)';
+$_lang["a83_ignore_ids_title"] = 'Ignore IDs(comma separate)';
+
+$_lang["update"] = 'Save';
+
+$_lang["a17_manager_inline_style_title"] = 'Append style';
+$_lang["a17_manager_inline_style_message"] = 'Append manager style';
+
+$_lang["configcheck_mgr_tpl"] = 'Extension of manager template filename';
+$_lang["configcheck_mgr_tpl_msg"] = 'Should be delete <a href="index.php?a=31&mode=drill&path=[+path+]assets/templates">assets/templates/manager/</a> directory';
+
+$_lang["not_readable_dir"] = 'У вас нет разрешения каталог или он не существует.';
+
+$_lang["configcheck_you_are_admin"] = 'Я вошли в систему как привилегированный пользователь';
+$_lang["configcheck_you_are_admin_msg"] = '<a href="index.php?a=86">Специальные права защищены. (Administrator)</a> Потому что она имеет особый характер, что не подходит для нормального управления контентом, создавать отдельный счет регулярно, эта роль рекомендуется, чтобы эта учетная запись будет использоваться для реагирования на чрезвычайные ситуации.';
+
+$_lang["login_settings"] = 'Настройки входа';
+$_lang["profile"] = 'Профиль';
+$_lang["default_role_title"] = 'Роль по умолчанию';
+$_lang["default_role_message"] = 'Установить значения по умолчанию при создании новой роли пользователя';
+$_lang["change_password_success"] = 'Пароль успешно изменен';
+
+$_lang['make_folders_title'] = 'Make end slash URL at the container';
+$_lang['make_folders_message'] = 'The slash to append to Resources set as containers when using FURLs.';
+
+$_lang["pwd_hash_algo_title"] = 'Хэш-алгоритм';
+$_lang["pwd_hash_algo_message"] = 'Сложно оно преобразуется в строку, алгоритм декодирования, что вы здесь укажете, пароль строка сохраняется в базе данных. Таким образом, вы можете предотвратить вредоносные третья сторона может получить пароль от БД данные. Это безопасный алгоритм в порядке сверху вниз. Потому что не может быть доступно на сервере, за исключением UNCRYPT, пожалуйста, будьте осторожны, когда вы передаете серверу.';
+
+$_lang["move_resource_cant_myself"] = 'You cannot move a resource to a child resource!';
+
+$_lang["topmenu_items_title"] = 'Top menu structure';
+$_lang["topmenu_items_message"] = 'Top menu structure in the manager interface';
+
+$_lang["open"] = 'Open';
+
+$_lang["tree_pane_open_default_title"] = 'Tree pane default';
+$_lang["tree_pane_open_default_message"] = 'Tree pane default';
+
+$modx_lang_attribute = 'ru'; // Manager HTML/XML Language Attribute see http://en.wikipedia.org/wiki/ISO_639-1
+$modx_manager_charset = 'UTF-8';
+setlocale (LC_ALL, 'ru_RU.UTF-8');
+$_lang["resource_opt_alvisibled"] = 'Участвует в URL';
+$_lang["resource_opt_alvisibled_help"] = 'Для участия данного документа в адресной строке поставьте галку, и наоборот - снимите, если псевдоним этого документа нужно убрать из URL.';
